@@ -136,4 +136,24 @@
 
 \begin{document}
 \maketitle
+\begin{abstract}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{doge.png}
+\end{figure}
+\end{abstract}
+\subsection{Introduction}
+In this project we will use Euler's forward method and Velocity Verlet to simulate the solar-system from given initial values. We will start off by looking at a solar system which only contains the Earth and the Sun and then we will expand by including other planets, starting with Jupiter.
+\subsection{Theory}
+Euler's forward method \husk{REF!} is a well known numerical method used to solve differential equations. The method is fairly simple, basing itself on that the next step is the former step added with its own derivative times a steplength. By defining $h$ as the step length we can write express Euler's forward method as follows:
+\begin{equation}
+x_{i + 1} = x_i + x^{'}_i \cdot h
+\label{eq:fwdEuler}
+\end{equation}
+where we define $x_i$ as $x(i)$, $x_{i+1} = x(i + h)$ and $i = 0, 1, 2 ... , n$. \\
+The Verlet Velocity method presents a different approach to solve the differential equations in this project. While Euler's method is applicable to many differential equations, the Verlet methods are specified to solve Newton's equations of motion \husk{REF}. \husk{Write the rest of the explanation. The method is written down both on Wiki and in the kladdebok on the second whole page from 30.09.2016}
+\subsection{Experimental}
+\subsection{Results}
+\subsection{Discussion}
+\subsection{Conclusion}
 \end{document}

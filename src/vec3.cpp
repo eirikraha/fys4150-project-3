@@ -138,6 +138,7 @@ vec3 &vec3::operator/=(vec3 rhs)
     return *this;
 }
 
+
 std::ostream &operator<<(std::ostream &os, const vec3 &myVector) // Allows cout << myVector << endl;
 {
     os << "[" << myVector.x() << ", " << myVector.y() << ", " << myVector.z() << "];";

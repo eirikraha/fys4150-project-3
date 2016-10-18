@@ -42,6 +42,7 @@ public:
     vec3 &operator-=(vec3 rhs);   // Componentwise subtraction with vector
     vec3 &operator/=(double rhs); // Componentwise division with scalar
     vec3 &operator/=(vec3 rhs);   // Componentwise division with vector
+
 private:
     double components[3];
 };

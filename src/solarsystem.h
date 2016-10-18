@@ -17,12 +17,12 @@ public:
     double totalEnergy() const;
     double potentialEnergy() const;
     double kineticEnergy() const;
-    void writeToFile(std::string filename);
+    void writeToFile(std::string filename, double i);
     vec3 angularMomentum() const;
     std::vector<CelestialBody> &bodies();
+    std::vector<CelestialBody> m_bodies;
 
 private:
-    std::vector<CelestialBody> m_bodies;
     vec3 m_angularMomentum;
     std::ofstream m_file;
     double m_kineticEnergy;

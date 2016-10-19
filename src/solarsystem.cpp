@@ -37,7 +37,7 @@ void SolarSystem::calculateForcesAndEnergy()
             // see if 4pi^2 factor can be put outside to reduce flops + check minus sign
             // check directionality of deltaRVector, among other things
             body1.force += force;
-            body2.force -= force;
+            body2.force -= force; // this sign is correct, otherwise cannot get circular orbit in ES
 
             // Potential energy, check minus sign again
             m_potentialEnergy += -4*pow(3.141592654,2) * body1.mass * body2.mass / dr;
@@ -67,7 +67,7 @@ double SolarSystem::kineticEnergy() const
     return m_kineticEnergy;
 }
 
-void SolarSystem::writeToFile(string filename, double i)
+void SolarSystem::writeToFile(string filename)
 {
     if(!m_file.good()) {
         m_file.open(filename.c_str(), ofstream::out);
@@ -78,7 +78,6 @@ void SolarSystem::writeToFile(string filename, double i)
     }
 
     m_file << numberOfBodies() << endl;
-    m_file << "i = " << i << endl;
     m_file << "Comment line that needs to be here. Balle." << endl;
     for(CelestialBody &body : m_bodies) {
         m_file << "1 " << body.position.x() << " " << body.position.y() << " " << body.position.z() << "\n";

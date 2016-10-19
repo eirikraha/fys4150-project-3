@@ -19,42 +19,65 @@
 #include "celestialbody.h"
 #include "solarsystem.h"
 #include "euler.h"
+#include "velocityverlet.h"
+#include "integrator.h"
 
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-    if (argc < 3 || argc > 4){
-        cout<<"Usage: "<<argv[0]<<" Task"<<" dt"<<" Method"<<endl;
+    if (argc < 3 || argc > 5){
+        cout<<"Usage: "<<argv[0]<<" Task"<<" dt"<<" task_param"<<" Method"<<endl;
+        cout<<"Task and dt always required, task_param and Method optional and depends on Task."<<"\n\n";
         cout<<"   Task : ES, ESesc,ESJ, WS or GM"<<endl;
         cout<<"   ES : Earth-Sun system. The Sun is fixed to origo."<<endl;
         cout<<"   ESesc: Earth-Sun system, find escape velocity. The Sun is fixed in origo." << endl;
         cout<<"   ESJ : Earth-Sun-Jupiter system. The Sun is fixed to origo."<<endl;
         cout<<"   WS : Whole solar system, including Pluto. The Sun is not fixed to origo."<<endl;
         cout<<"   GM : General relativity with Mercury (not Freddie)."<<endl; //change this when we have understood the task.
-        cout<< "  dt : time step" << endl;
-        cout<< "  Method : Euler or Verlet, set to Verlet if not specified" << endl;
+        cout<<"   dt : time step" << endl;
+        cout<<"   task_param : Meaning depends on Task"<<endl;
+        cout<<"     -ES/ESesc : task_param is initial velocity of the Earth in y direction [AU/yr]."<<endl;
+        cout<<"     -ESJ: task_param spesifies a number multiplied with mass of Jupiter to alter it."<<endl;
+        cout<<"   Method : Euler or Verlet, set to Verlet if not specified" << endl;
+        cout<<"    Note that Verlet is actually velocity Verlet, but the name is fairly long, hence the shortening."<<endl;
         exit(1);
     }
 
-
-    if (argc < 4)
+    /* Specifying the algorithm used to solve numerically */
+    char const *method = "Verlet";
+    if (argc == 5)
     {
-        int method = 0;
-    }
-    else if (argc == 4)
-    {
-        if(strcmp(argv[3], "Euler") == 0)  //Checks which method is specified. Make it more fancy another day.
+        if (!(strcmp(argv[4],"Euler")==0 || strcmp(argv[4],"Verlet")==0))
         {
-            int method = 1;
+            cout<<"Method not specified correctly, use 'Euler' or  'Verlet'. Set to Verlet by default."<<endl;
         }
         else
         {
-            int method = 0;
+            method = argv[4];
         }
     }
 
+    /*
+    *if (argc < 5)
+    *{
+    *    char method = "Verlet";
+    *}
+    *else if (argc == 5)
+    *{
+    *    if(strcmp(argv[4], "Euler") == 0)  //Checks which method is specified. Make it more fancy another day.
+    *    {
+    *        int method = 1;
+    *    }
+    *    else
+    *    {
+    *        int method = 0;
+    *    }
+    *}
+    */
     SolarSystem solarSystem; // initializing solar system
+    double dt = atof(argv[2]);
+    int num_timesteps = 1000;
 
     /* Need to do this more properly later, this is just for simple implementation
      * TODO:
@@ -89,33 +112,40 @@ int main(int argc, char *argv[])
      *   - 3g: general relativistic correction (mercury!)
      */
 
-    double dt = atof(argv[2]);
-    CelestialBody &sun = solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the sun
-    // initializing some stuff
-    vec3 r_earth(1,0,0);
-    vec3 v_earth(0,1,0);
-    // Adding earth to celestial body
-
-    solarSystem.createCelestialBody(r_earth, v_earth, 3e-6);
-
     /////////////////////////////////////////////
     ///    Earth-Sun system, Sun is fixed     ///
     /////////////////////////////////////////////
 
     if (strcmp(argv[1], "ES") == 0)
     {
+        solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the sun
+        // initializing some stuff
+
+        double v_y0 = 6.28; // not completely random default value
+        if (argc > 3)
+        {
+            v_y0 = atof(argv[3]);
+        }
+
+        vec3 r_earth(1,0,0);
+        vec3 v_earth(0,v_y0,0);
+        // Adding earth to celestial body
+
+        solarSystem.createCelestialBody(r_earth, v_earth, 3e-6);
+
         solarSystem.writeToFile("../benchmarks/positions.xyz", 0); //initializing file
-        Euler integrator(dt);
+        Integrator integrator(dt,method);
+        // Euler integrator(dt);
+        // VelocityVerlet integrator(dt);
 
         //Access sun position so that we can keep it still
         std::vector<CelestialBody> &m_bodies = solarSystem.bodies();
         CelestialBody &body = m_bodies[0];
 
-
-        for (int i=0; i<1000; i++)
+        for (int i=0; i<num_timesteps; i++)
         {
             integrator.integrateOneStep(solarSystem);
-            body.position = vec3(0,0,0); // might be needed
+            body.position = vec3(0,0,0); // fixing the Sun to (0,0,0) each step
             solarSystem.writeToFile("../benchmarks/positions.xyz", i);
         }
     }

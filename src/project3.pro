@@ -8,11 +8,13 @@ SOURCES += main.cpp \
     celestialbody.cpp \
     solarsystem.cpp \
     euler.cpp \
-    velocityverlet.cpp
+    velocityverlet.cpp \
+    integrator.cpp
 
 HEADERS += \
     vec3.h \
     celestialbody.h \
     solarsystem.h \
     euler.h \
-    velocityverlet.h
+    velocityverlet.h \
+    integrator.h

@@ -1,10 +1,3 @@
-//#include <iostream>
-//#include <iomanip>
-//#include <string>
-//#include <fstream>
-//#include <cmath>
-//#include <time.h>
-
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -58,23 +51,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    /*
-    *if (argc < 5)
-    *{
-    *    char method = "Verlet";
-    *}
-    *else if (argc == 5)
-    *{
-    *    if(strcmp(argv[4], "Euler") == 0)  //Checks which method is specified. Make it more fancy another day.
-    *    {
-    *        int method = 1;
-    *    }
-    *    else
-    *    {
-    *        int method = 0;
-    *    }
-    *}
-    */
     SolarSystem solarSystem; // initializing solar system
     double dt = atof(argv[2]);
     int num_timesteps = 1000;
@@ -115,17 +91,19 @@ int main(int argc, char *argv[])
     /////////////////////////////////////////////
     ///    Earth-Sun system, Sun is fixed     ///
     /////////////////////////////////////////////
-
     if (strcmp(argv[1], "ES") == 0)
     {
-        solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the sun
-        // initializing some stuff
-
         double v_y0 = 6.28; // not completely random default value
         if (argc > 3)
         {
             v_y0 = atof(argv[3]);
         }
+
+        // Creating filename for this part
+        string filename = "../benchmarks/ES/positions_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_vy"+to_string(v_y0)+".xyz";
+
+        solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the sun
+        // initializing some stuff
 
         vec3 r_earth(1,0,0);
         vec3 v_earth(0,v_y0,0);
@@ -133,7 +111,7 @@ int main(int argc, char *argv[])
 
         solarSystem.createCelestialBody(r_earth, v_earth, 3e-6);
 
-        solarSystem.writeToFile("../benchmarks/positions.xyz", 0); //initializing file
+        solarSystem.writeToFile(filename); //initializing file
         Integrator integrator(dt,method);
         // Euler integrator(dt);
         // VelocityVerlet integrator(dt);
@@ -146,7 +124,7 @@ int main(int argc, char *argv[])
         {
             integrator.integrateOneStep(solarSystem);
             body.position = vec3(0,0,0); // fixing the Sun to (0,0,0) each step
-            solarSystem.writeToFile("../benchmarks/positions.xyz", i);
+            solarSystem.writeToFile(filename);
         }
     }
 
@@ -154,10 +132,51 @@ int main(int argc, char *argv[])
     {
         cout << "Now these points of data make a beautiful line." << endl;
     }
+
+    /////////////////////////////////////////////
+    ///    Earth-Sun-Jupiter, Sun is fixed    ///
+    /////////////////////////////////////////////
     else if(strcmp(argv[1], "ESJ") == 0)
     {
-        cout << "And we're out of beta, we're releasing on time." << endl;
+        double factor = 1.0; // factor to scale the mass of Jupiter
+        if (argc>3)
+        {
+            factor = atof(argv[3]);
+        }
+        // Creating filename
+        string filename = "../benchmarks/ESJ/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_m"+to_string(factor)+".xyz";
+
+        // Adding objects to the solar system
+        solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the Sun
+
+        // Adding the Earth
+        vec3 pos_E = vec3(9.00219e-1, 4.36991e-1, -1.77691e-4);  // position [AU]
+        vec3 vel_E = vec3(-7.76495e-3, 1.54282e-2, -4.06713e-7); // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_E, vel_E*365, 3e-6); // adding the Earth
+
+        // Adding Jupiter
+        vec3 pos_J = vec3(-5.42632, -4.82222e-1, 1.23357e-1);    // position [AU]
+        vec3 vel_J = vec3(5.81068e-4, -7.16029e-3, 1.67576e-5);  // velocity [AU/day]
+
+        solarSystem.createCelestialBody(pos_J, vel_J*365, factor*1e-3); // adding Jupiter
+
+        solarSystem.writeToFile(filename); //initializing file
+        Integrator integrator(dt,method);
+
+        //Access sun position so that we can keep it still
+        // do we still want to do this in this task?
+        std::vector<CelestialBody> &m_bodies = solarSystem.bodies();
+        CelestialBody &body = m_bodies[0];
+
+        for (int i=0; i<num_timesteps; i++)
+        {
+            integrator.integrateOneStep(solarSystem);
+            body.position = vec3(0,0,0); // fixing the Sun to (0,0,0) each step
+            solarSystem.writeToFile(filename);
+        }
+
     }
+
     else if(strcmp(argv[1], "WS") == 0)
     {
         cout << "So I'm GLaD I got burned." << endl;

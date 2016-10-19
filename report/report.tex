@@ -186,11 +186,50 @@ where $r$ now is given in units AU. \red{not fully satisfied here, try to add so
 \subsubsection{Numerically solving ordinary differential equations}
 Euler's forward method \husk{REF!} is a well known numerical method used to solve differential equations. The method is fairly simple, basing itself on that the next step is the former step added with its own derivative times a steplength. By defining $h$ as the step length we can write express Euler's forward method as follows:
 \begin{equation}
-x_{i + 1} = x_i + x^{'}_i \cdot h
+f_{i + 1} = f_i + f^{'}_i \cdot h
 \label{eq:fwdEuler}
 \end{equation}
-where we define $x_i$ as $x(i)$, $x_{i+1} = x(i + h)$ and $i = 0, 1, 2 ... , n$. \\
-The Verlet Velocity method presents a different approach to solve the differential equations in this project. While Euler's method is applicable to many differential equations, the Verlet methods are specified to solve Newton's equations of motion \husk{REF}. \husk{Write the rest of the explanation. The method is written down both on Wiki and in the kladdebok on the second whole page from 30.09.2016}
+where we define $f_i$ as $f(i)$, $f_{i+1} = f(i + h)$ and $i = 0, 1, 2 ... , n$. \\
+In our case we use Newton's laws and we want to find the position and velocity of our celestial bodies. Since it's easy to find the acceleration from equation \eqref{eq:FG_comp}, and we know that $a = \frac{\partial^2 x}{\partial t^2}$ and $v = \frac{\partial x}{\partial t}$ where $x$ is position, $v$ is velocity and $a$ is acceleration, Euler's forward method becomes:
+\begin{equation}
+v_{i + 1} = v_i + h \cdot a_i + \mathcal{O}(h^2)\\
+\label{eq:Eulervel}
+\end{equation}
+\husk{Uncertain about the error, check before delivery}
+\begin{equation}
+x_{i + 1} = x_i + h \cdot v_i + \mathcal{O}(h^3)\\
+\label{eq:Eulerpos}
+\end{equation}
+The Verlet Velocity method presents a different approach to solve the differential equations in this project. While Euler's method is applicable to many differential equations, the Verlet methods are specified to solve Newton's equations of motion \husk{REF}. The Verlet Velocity method is derived by first Taylor expanding $x_{i + 1}$ ad $x_{i-1}$:
+\begin{align*}
+x_{i-1} &\simeq x_i - v_i h + \frac{1}{2}a_i h^2 \\
+x_{i+1} &\simeq x_i + v_i h + \frac{1}{2}a_i h^2
+\intertext{By adding the two expressions we can find an expression for $x_{i+1}$}
+x_{i+1} + x_{i-1} &= 2x_i + a_i h^2 \\
+x_{i+1} &= 2x_i - x_{i-1} + a_i h^2 \\
+\intertext{and by subtracting them we can find an expression for $v_{i}$}
+x_{i+1} - x_{i-1} &= 2h v_i \\
+v_i &= \frac{x_{i+1} - x_{i-1}}{2h}
+\intertext{These expressions for $x_{i+1}$ and $v_i$ are called the Verlet method. However, we want to have an expression for $v_{i+1}$.}
+v_{i+1} &= \frac{x_{i+2} - x_i}{2h} \\
+\intertext{We can easily find $x_{i+1}$ by using the expression above}
+x_{i+2} &= 2x_{i+1} - x_i + a_{i+1} h^2 \\
+\intertext{Inserting this back into $v_{i+1}$ gives us:}
+v_{i+1} &= \frac{2x_{i+1} - x_i + a_{i+1} h^2 - x_i}{2h} \\
+v_{i+1} &= \frac{x_{i+1} - x_i}{h} + \frac{1}{2} a_{i+1} h
+\intertext{Inserting the Taylor expanded $x_{i+1}$ for $v_i$ dependency}
+v_{i+1} &= \frac{x_i + v_i h + \frac{1}{2} a_i h^2 - x_i}{h} + \frac{1}{2} a_{i+1} h \\
+v_{i+1} &= v_i + \frac{1}{2} a_i h + \frac{1}{2} a_{i+1} h \\
+\end{align*}
+This gives us the equations for position and velocity in the velocity Verlet method:
+\begin{equation}
+x_{i+1} = x_i + v_i h + \frac{1}{2} a_i h^2
+\label{eq:Verletpos}
+\end{equation}
+\begin{equation}
+v_{i+1} = v_i + \frac{1}{2} h (a_i + a_{i+1})
+\label{eq:Verletvel}
+\end{equation}
 \subsection{Experimental}
 \subsection{Results}
 \subsection{Discussion}

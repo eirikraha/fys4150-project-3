@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include <iomanip>
 #include <string>
 #include <fstream>
@@ -41,9 +41,9 @@ int main(int argc, char *argv[])
     char const *method = "Verlet";
     if (argc == 5)
     {
-        if (!(strcmp(argv[4],"Euler")==0 || strcmp(argv[4],"Verlet")==0))
+        if (!(strcmp(argv[4],"Euler")==0 || strcmp(argv[4],"Verlet")==0 || strcmp(argv[4], "VerletREL") == 0))
         {
-            cout<<"Method not specified correctly, use 'Euler' or  'Verlet'. Set to Verlet by default."<<endl;
+            cout<<"Method not specified correctly, use 'Euler', 'Verlet' or 'VerletREL'. Set to Verlet by default."<<endl;
         }
         else
         {
@@ -263,7 +263,31 @@ int main(int argc, char *argv[])
 
     else if(strcmp(argv[1], "GM") == 0)
     {
-        cout << "Think of all the things we learned." << endl;
+        // Creating filename
+        string filename = "../benchmarks/GM/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+".xyz";
+
+        // Adding objects to the solar system
+        solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the Sun
+
+        // Relative masses, in units [M_sun]
+        double M_sun = 2e30;             // mass of the Sun in kg
+        double M_mercury = 2.4e23/M_sun;       // mass of Mercury in kg
+
+        // Adding the Earth
+        vec3 pos_M = vec3(0.3075, 0, 0);  // position [AU]
+        vec3 vel_M = vec3(0, 12.44, 0); // velocity [AU/year]
+        solarSystem.createCelestialBody(pos_M, vel_M, M_mercury); // adding Mercury
+
+        // Integrating the system
+        solarSystem.writeToFile(filename); //initializing file
+        Integrator integrator(dt,method);
+
+        for (int i=0; i<num_timesteps; i++)
+        {
+            integrator.integrateOneStep(solarSystem);
+            solarSystem.writeToFile(filename);
+        }
+
     }
     else
     {

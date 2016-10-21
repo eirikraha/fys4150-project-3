@@ -74,3 +74,20 @@ if __name__=='__main__':
         legend(numpoints=1,fontsize=14)
         savefig('../figures/earth_sun_jupiter.png')
         show()
+
+            # Plot ES
+    if task=='GM':
+        filename = '../benchmarks/GM/pos_dt0.010000_N1000.xyz'
+        positions = read_file(filename,N)
+
+        plot(positions[0][:,0],positions[0][:,1],label='Sun')
+        plot(positions[1][:,0],positions[1][:,1],label='Mercury')
+        xlabel('x [AU]',size=17)
+        ylabel('y [AU]',size=17)
+        title('Mercury-Sun system',size=17)
+        grid('on')
+        legend(fontsize=14)
+        #xlim([-1.1e1,1.1e1])
+        #ylim([-1.1e3,1.1e3])
+        savefig('../figures/Mercury_sun.png')
+        show()

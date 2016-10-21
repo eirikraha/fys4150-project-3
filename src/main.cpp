@@ -1,10 +1,3 @@
-//#include <iostream>
-//#include <iomanip>
-//#include <string>
-//#include <fstream>
-//#include <cmath>
-//#include <time.h>
-
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -58,23 +51,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    /*
-    *if (argc < 5)
-    *{
-    *    char method = "Verlet";
-    *}
-    *else if (argc == 5)
-    *{
-    *    if(strcmp(argv[4], "Euler") == 0)  //Checks which method is specified. Make it more fancy another day.
-    *    {
-    *        int method = 1;
-    *    }
-    *    else
-    *    {
-    *        int method = 0;
-    *    }
-    *}
-    */
     SolarSystem solarSystem; // initializing solar system
     double dt = atof(argv[2]);
     int num_timesteps = 1000;
@@ -85,10 +61,8 @@ int main(int argc, char *argv[])
      *  - scale mass with the solar mass
      *  - scale distance and velocity to [AU] and [AU/day]? im confused
      *
-     * - Add velocity verlet integration and forward euler
      * - Write to file some way / solarsystem has such an elegant way of opening files only once :(
      * - WHAT THE FUCK IS EVEN WRITTEN TO FILE?????
-     * - And why does it unexpectedly finish????!?!??!!??!!?!???!?!?!11111
      * - We might have to manually set the Sun position in (0,0,0) each iteration for the first tasks
      *
      * - Maybe add folders in benchmarks for the different tasks, so as to make it more readable?
@@ -115,17 +89,19 @@ int main(int argc, char *argv[])
     /////////////////////////////////////////////
     ///    Earth-Sun system, Sun is fixed     ///
     /////////////////////////////////////////////
-
     if (strcmp(argv[1], "ES") == 0)
     {
-        solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the sun
-        // initializing some stuff
-
         double v_y0 = 6.28; // not completely random default value
         if (argc > 3)
         {
             v_y0 = atof(argv[3]);
         }
+
+        // Creating filename for this task
+        string filename = "../benchmarks/ES/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_vy"+to_string(v_y0)+".xyz";
+
+        solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the sun
+        // initializing some stuff
 
         vec3 r_earth(1,0,0);
         vec3 v_earth(0,v_y0,0);
@@ -133,7 +109,7 @@ int main(int argc, char *argv[])
 
         solarSystem.createCelestialBody(r_earth, v_earth, 3e-6);
 
-        solarSystem.writeToFile("../benchmarks/positions.xyz", 0); //initializing file
+        solarSystem.writeToFile(filename); //initializing file
         Integrator integrator(dt,method);
         // Euler integrator(dt);
         // VelocityVerlet integrator(dt);
@@ -146,7 +122,7 @@ int main(int argc, char *argv[])
         {
             integrator.integrateOneStep(solarSystem);
             body.position = vec3(0,0,0); // fixing the Sun to (0,0,0) each step
-            solarSystem.writeToFile("../benchmarks/positions.xyz", i);
+            solarSystem.writeToFile(filename);
         }
     }
 
@@ -154,14 +130,137 @@ int main(int argc, char *argv[])
     {
         cout << "Now these points of data make a beautiful line." << endl;
     }
+
+    /////////////////////////////////////////////
+    ///    Earth-Sun-Jupiter, Sun is fixed    ///
+    /////////////////////////////////////////////
     else if(strcmp(argv[1], "ESJ") == 0)
     {
-        cout << "And we're out of beta, we're releasing on time." << endl;
+        double factor = 1.0; // factor to scale the mass of Jupiter
+        if (argc>3)
+        {
+            factor = atof(argv[3]);
+        }
+        // Creating filename
+        string filename = "../benchmarks/ESJ/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_m"+to_string(factor)+".xyz";
+
+        // Adding objects to the solar system
+        solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the Sun
+
+        // Relative masses, in units [M_sun]
+        double M_sun = 2e30;             // mass of the Sun in kg
+        double M_earth = 6e24/M_sun;     // rel. mass of the Earth
+        double M_jupiter = 1.9e27/M_sun; // rel. mass of Jupiter
+
+        // Adding the Earth
+        vec3 pos_E = vec3(9.00219e-1, 4.36991e-1, -1.77691e-4);  // position [AU]
+        vec3 vel_E = vec3(-7.76495e-3, 1.54282e-2, -4.06713e-7); // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_E, vel_E*365.25, M_earth); // adding the Earth
+
+        // Adding Jupiter
+        vec3 pos_J = vec3(-5.42632, -4.82222e-1, 1.23357e-1);    // position [AU]
+        vec3 vel_J = vec3(5.81068e-4, -7.16029e-3, 1.67576e-5);  // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_J, vel_J*365.25, factor*M_jupiter); // adding Jupiter
+
+        solarSystem.writeToFile(filename); //initializing file
+        Integrator integrator(dt,method);
+
+        //Access sun position so that we can keep it still
+        // do we still want to do this in this task?
+        std::vector<CelestialBody> &m_bodies = solarSystem.bodies();
+        CelestialBody &body = m_bodies[0];
+
+        for (int i=0; i<num_timesteps; i++)
+        {
+            integrator.integrateOneStep(solarSystem);
+            body.position = vec3(0,0,0); // fixing the Sun to (0,0,0) each step
+            solarSystem.writeToFile(filename);
+        }
+
     }
+
+    /////////////////////////////////////////////
+    ///   Final model of entire solar system  ///
+    /////////////////////////////////////////////
     else if(strcmp(argv[1], "WS") == 0)
     {
-        cout << "So I'm GLaD I got burned." << endl;
+        // Creating filename
+        string filename = "../benchmarks/WS/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+".xyz";
+
+        // Relative masses, in units [M_sun]
+        double M_sun = 2e30;              // mass of the Sun in kg
+        double M_mercury = 2.4e23/M_sun;  // rel. mass of Mercury
+        double M_venus = 4.9e24/M_sun;    // rel. mass of Venus
+        double M_earth = 6e24/M_sun;      // rel. mass of the Earth
+        double M_mars = 6.6e23/M_sun;     // rel. mass of Mars
+        double M_jupiter = 1.9e27/M_sun;  // rel. mass of Jupiter
+        double M_saturn = 5.5e26/M_sun;   // rel. mass of Saturn
+        double M_uranus = 8.8e25/M_sun;   // rel. mass of Uranus
+        double M_neptune = 1.03e26/M_sun; // rel. mass of Neptune
+        double M_pluto = 1.31e22/M_sun;   // rel. mass of Pluto
+
+        // Adding objects to the solar system
+        vec3 pos_sun = vec3( 3.557522499727856E-03,  3.436899814085439E-03, -1.596344425455737E-04); // position [AU]
+        vec3 vel_sun = vec3(-2.030857186518649E-06,  6.828431295519784E-06,  4.169177553390423E-08); // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_sun, vel_sun, 1.0); // adding the Sun in solar system barycenter
+
+        // Adding Mercury
+        vec3 pos_mercury = vec3(-3.879399114091706E-01, -2.710305092518798E-02,  3.326156756039202E-02); // position [AU]
+        vec3 vel_mercury = vec3(-3.666413559516294E-03, -2.683296386126161E-02, -1.856913029011958E-03); // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_mercury, vel_mercury*365.25, M_mercury); // adding Mercury
+
+        // Adding Venus
+        vec3 pos_venus = vec3( 2.768509256072073E-01, -6.707683947636957E-01, -2.517488922555787E-02);   // position [AU]
+        vec3 vel_venus = vec3( 1.860690284828718E-02,  7.536836731263053E-03, -9.705618181506076E-04);   // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_venus, vel_venus*365.25, M_venus); // adding Venus
+
+        // Adding the Earth
+        vec3 pos_earth = vec3( 9.002187374164167E-01, 4.369907064244718E-01, -1.776909578696060E-04);    // position [AU]
+        vec3 vel_earth = vec3(-7.764951739652256E-03, 1.542821220223306E-02, -4.067127050855086E-07);    // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_earth, vel_earth*365.25, M_earth); // adding the Earth
+
+        // Adding Mars
+        vec3 pos_mars = vec3( 1.193657284115136E+00, -6.978436624748694E-01, -4.406298715121766E-02);     // position [AU]
+        vec3 vel_mars = vec3( 7.634665383846734E-03,  1.326168661732281E-02,  9.038452721655709E-05);     // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_mars, vel_mars*365.25, M_mars); // adding Mars
+
+        // Adding Jupiter
+        vec3 pos_jupiter = vec3(-5.426315241208865E+00, -4.822215431711254E-01, 1.233572936426657E-01);   // position [AU]
+        vec3 vel_jupiter = vec3( 5.810683650779558E-04, -7.160289109931362E-03, 1.675759064981599E-05);   // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_jupiter, vel_jupiter*365.25, M_jupiter); // adding Jupiter
+
+        // Adding Saturn
+        vec3 pos_saturn = vec3(-2.246529956275636E+00, -9.779906769909475E+00,  2.594563214268305E-01);   // position [AU]
+        vec3 vel_saturn = vec3( 5.132048253878187E-03, -1.266819166886991E-03, -1.820892763587737E-04);   // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_saturn, vel_saturn*365.25, M_saturn); // adding Saturn
+
+        // Adding Uranus
+        vec3 pos_uranus = vec3( 1.845714208857284E+01,  7.575248291656612E+00, -2.109811593159080E-01);   // position [AU]
+        vec3 vel_uranus = vec3(-1.522058331202997E-03,  3.455221416420103E-03,  3.261108191126768E-05);   // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_uranus, vel_uranus*365.25, M_uranus); // adding Uranus
+
+        // Adding Neptune
+        vec3 pos_neptune = vec3( 2.826500658751187E+01, -9.910371276589974E+00, -4.473108323922165E-01);  // position [AU]
+        vec3 vel_neptune = vec3( 1.017401746439024E-03,  2.980597140971018E-03, -8.489925094644433E-05);  // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_neptune, vel_neptune*365.25, M_neptune); // adding Neptune
+
+        // Adding Pluto
+        vec3 pos_pluto = vec3( 9.436138126711999E+00, -3.181728263243627E+01,  6.751503215275325E-01);    // position [AU]
+        vec3 vel_pluto = vec3( 3.069571857572786E-03,  2.445305051568931E-04, -9.024173240192213E-04);    // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_pluto, vel_pluto*365.25, M_pluto); // adding Pluto
+
+        // Integrating the system
+        solarSystem.writeToFile(filename); //initializing file
+        Integrator integrator(dt,method);
+
+        for (int i=0; i<num_timesteps; i++)
+        {
+            integrator.integrateOneStep(solarSystem);
+            solarSystem.writeToFile(filename);
+        }
+
     }
+
     else if(strcmp(argv[1], "GM") == 0)
     {
         cout << "Think of all the things we learned." << endl;
@@ -174,3 +273,5 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+

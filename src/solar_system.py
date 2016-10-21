@@ -30,23 +30,26 @@ if __name__=='__main__':
     try:
         task = sys.argv[1]
     except IndexError:
-        task = 'ESJ'
+        task = 'ES'
 
     N = 1000 # need this, need to change naming convention of files
     # if name contains N, we could just fill arrays instead of lists
 
     # Plot ES
     if task=='ES':
-        filename = '../benchmarks/ES/pos_dt0.001000_N1000_vy6.280000.xyz'
+        filename = '../benchmarks/ES/pos_Euler_dt0.001000_N1000_vy6.280000.xyz'
         positions = read_file(filename,N)
 
-        plot(positions[0][:,0],positions[0][:,1],label='Sun')
-        plot(positions[1][:,0],positions[1][:,1],label='Earth')
+        plot(positions[0][0,0],positions[0][0,1],'oy',ms=20,label='Sun')
+        plot(positions[1][0,0],positions[1][0,1],'ob',ms=10,label='Earth')
+
+        plot(positions[0][:,0],positions[0][:,1],'y')
+        plot(positions[1][:,0],positions[1][:,1],'b')
         xlabel('x [AU]',size=17)
         ylabel('y [AU]',size=17)
         title('Earth-Sun system',size=17)
         grid('on')
-        legend(fontsize=14)
+        legend(numpoints=1,fontsize=14)
         xlim([-1.1,1.1])
         ylim([-1.1,1.1])
         savefig('../figures/earth_sun.png')
@@ -75,9 +78,9 @@ if __name__=='__main__':
         savefig('../figures/earth_sun_jupiter.png')
         show()
 
-            # Plot ES
-    if task=='GM':
-        filename = '../benchmarks/GM/pos_dt0.010000_N1000.xyz'
+    # Plot GR
+    if task=='GR':
+        filename = '../benchmarks/GR/pos_dt0.010000_N1000.xyz'
         positions = read_file(filename,N)
 
         plot(positions[0][:,0],positions[0][:,1],label='Sun')

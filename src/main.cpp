@@ -11,8 +11,6 @@
 #include "vec3.h"
 #include "celestialbody.h"
 #include "solarsystem.h"
-#include "euler.h"
-#include "velocityverlet.h"
 #include "integrator.h"
 
 using namespace std;
@@ -55,18 +53,8 @@ int main(int argc, char *argv[])
     double dt = atof(argv[2]);
     int num_timesteps = 1000;
 
-    /* Need to do this more properly later, this is just for simple implementation
-     * TODO:
-     * - Add initial conditions for other planets (PLUTO ISNT A PLANET DAMNIT!) add pluto as well though
-     *  - scale mass with the solar mass
-     *  - scale distance and velocity to [AU] and [AU/day]? im confused
-     *
-     * - Write to file some way / solarsystem has such an elegant way of opening files only once :(
-     * - WHAT THE FUCK IS EVEN WRITTEN TO FILE?????
-     * - We might have to manually set the Sun position in (0,0,0) each iteration for the first tasks
-     *
+    /* TODO:
      * - Maybe add folders in benchmarks for the different tasks, so as to make it more readable?
-     *
      * - Need to set up program with some sort of task structure
      *   - 3b: earth-sun system, no solar motion, just write algorithms
      *
@@ -80,9 +68,6 @@ int main(int argc, char *argv[])
      *   - 3e: earth-sun-jupiter, sun still in (0,0,0)
      *     - see how much jupiter alters course. change m_j to different values
      *
-     *   - 3f: earth-sun-jupiter, sun moves!
-     *     - add more planets and moons if time
-     *
      *   - 3g: general relativistic correction (mercury!)
      */
 
@@ -91,39 +76,61 @@ int main(int argc, char *argv[])
     /////////////////////////////////////////////
     if (strcmp(argv[1], "ES") == 0)
     {
-        double v_y0 = 6.28; // not completely random default value
+        double v_y0 = 6.28; // for circular orbit
         if (argc > 3)
         {
             v_y0 = atof(argv[3]);
         }
 
-        // Creating filename for this task
-        string filename = "../benchmarks/ES/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_vy"+to_string(v_y0)+".xyz";
+        // Finding number of time steps based on how many years we want the program to run
+        num_timesteps = 1/dt; // 1 yr / dt [yr]
 
+        // Creating filename for this task
+        string meth = method;
+        string filename = "../benchmarks/ES/pos_"+meth+"_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_vy"+to_string(v_y0)+".xyz";
+
+        // For timing segments of code, comment out write to file
+        //clock_t start, finish;
+        //ofstream time_ofile;
+        //time_ofile.open("../benchmarks/ES/timing.txt",ios_base::app);
+
+        // Adding objects to our solar system
         solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the sun
-        // initializing some stuff
 
         vec3 r_earth(1,0,0);
         vec3 v_earth(0,v_y0,0);
-        // Adding earth to celestial body
-
-        solarSystem.createCelestialBody(r_earth, v_earth, 3e-6);
+        solarSystem.createCelestialBody(r_earth, v_earth, 3e-6); // adding the Earth
 
         solarSystem.writeToFile(filename); //initializing file
         Integrator integrator(dt,method);
-        // Euler integrator(dt);
-        // VelocityVerlet integrator(dt);
 
         //Access sun position so that we can keep it still
         std::vector<CelestialBody> &m_bodies = solarSystem.bodies();
         CelestialBody &body = m_bodies[0];
 
+
+        // Checking if kinetic and potential energy is conserved
+        double totalEnergy0 = solarSystem.totalEnergy();
+
+
+        //start = clock();
         for (int i=0; i<num_timesteps; i++)
         {
             integrator.integrateOneStep(solarSystem);
             body.position = vec3(0,0,0); // fixing the Sun to (0,0,0) each step
             solarSystem.writeToFile(filename);
         }
+
+        double totE_end = solarSystem.totalEnergy();
+        cout<<totalEnergy0<<endl<<totE_end<<endl;
+
+        // Time calculation and write to file
+        //finish = clock();
+        //double time_duration = ((finish-start)/((double)CLOCKS_PER_SEC));
+        //time_ofile<<method<<", dt = "<<setw(8)<<dt<<", N = "<<setw(8)<<num_timesteps<<endl;
+        //time_ofile<<"t = "<<setw(10)<<setprecision(8)<<time_duration<<"\n\n";
+        //time_ofile.close();
+
     }
 
     else if(strcmp(argv[1], "ESesc") == 0)
@@ -153,20 +160,19 @@ int main(int argc, char *argv[])
         double M_jupiter = 1.9e27/M_sun; // rel. mass of Jupiter
 
         // Adding the Earth
-        vec3 pos_E = vec3(9.00219e-1, 4.36991e-1, -1.77691e-4);  // position [AU]
-        vec3 vel_E = vec3(-7.76495e-3, 1.54282e-2, -4.06713e-7); // velocity [AU/day]
-        solarSystem.createCelestialBody(pos_E, vel_E*365.25, M_earth); // adding the Earth
+        vec3 pos_earth = vec3( 9.002187374164167E-01, 4.369907064244718E-01, -1.776909578696060E-04);    // position [AU]
+        vec3 vel_earth = vec3(-7.764951739652256E-03, 1.542821220223306E-02, -4.067127050855086E-07);    // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_earth, vel_earth*365.25, M_earth); // adding the Earth
 
         // Adding Jupiter
-        vec3 pos_J = vec3(-5.42632, -4.82222e-1, 1.23357e-1);    // position [AU]
-        vec3 vel_J = vec3(5.81068e-4, -7.16029e-3, 1.67576e-5);  // velocity [AU/day]
-        solarSystem.createCelestialBody(pos_J, vel_J*365.25, factor*M_jupiter); // adding Jupiter
+        vec3 pos_jupiter = vec3(-5.426315241208865E+00, -4.822215431711254E-01, 1.233572936426657E-01);   // position [AU]
+        vec3 vel_jupiter = vec3( 5.810683650779558E-04, -7.160289109931362E-03, 1.675759064981599E-05);   // velocity [AU/day]
+        solarSystem.createCelestialBody(pos_jupiter, vel_jupiter*365.25, M_jupiter); // adding Jupiter
 
         solarSystem.writeToFile(filename); //initializing file
         Integrator integrator(dt,method);
 
         //Access sun position so that we can keep it still
-        // do we still want to do this in this task?
         std::vector<CelestialBody> &m_bodies = solarSystem.bodies();
         CelestialBody &body = m_bodies[0];
 

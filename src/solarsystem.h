@@ -20,14 +20,17 @@ public:
     double kineticEnergy() const;
     void writeToFile(std::string filename);
     vec3 angularMomentum() const;
+    vec3 momentum() const;
     std::vector<CelestialBody> &bodies();
     std::vector<CelestialBody> m_bodies;
 
 private:
     vec3 m_angularMomentum;
+    vec3 m_momentum;
     std::ofstream m_file;
     double m_kineticEnergy;
     double m_potentialEnergy;
+    double pi;
 };
 
 #endif // SOLARSYSTEM_H

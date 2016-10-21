@@ -120,6 +120,20 @@ void SolarSystem::writeToFile(string filename)
     }
 }
 
+void SolarSystem::writeToFilePER(string filename, double i, double thetaPrevious)
+{
+    if(!m_file.good()) {
+        m_file.open(filename.c_str(), ofstream::out);
+        if(!m_file.good()) {
+            cout << "Error opening file " << filename << ". Aborting!" << endl;
+            terminate();
+        }
+    }
+
+    m_file << "Perihelion angle = " << thetaPrevious << " at i = " << i << endl;
+
+}
+
 vec3 SolarSystem::angularMomentum() const
 {
     return m_angularMomentum;

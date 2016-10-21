@@ -263,8 +263,10 @@ int main(int argc, char *argv[])
 
     else if(strcmp(argv[1], "GM") == 0)
     {
+        int num_timesteps = 10/dt;
         // Creating filename
-        string filename = "../benchmarks/GM/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+".xyz";
+        string methodstr = method;
+        string filename = "../benchmarks/GM/ang_per"+methodstr + "_dt" + to_string(dt);
 
         // Adding objects to the solar system
         solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the Sun
@@ -278,14 +280,50 @@ int main(int argc, char *argv[])
         vec3 vel_M = vec3(0, 12.44, 0); // velocity [AU/year]
         solarSystem.createCelestialBody(pos_M, vel_M, M_mercury); // adding Mercury
 
+        // Set some helper variables before we start the time integration.
+        double thetaPrevious        = 0;	// The perihelion angle of the previous time step.
+        double thetaCurrent         = 0;	// The perihelion angle of the current time step.
+
+        double rPreviousPrevious 	= 0;	// Mercury-Sun-distance two times steps ago.
+        double rPrevious            = 0;	// Mercury-Sun-distance of the previous time step.
+        double r                    = 0;	// Mercury-Sun-distance of the current time step.
+
+        std::vector<CelestialBody> &m_bodies = solarSystem.bodies();
+
         // Integrating the system
-        solarSystem.writeToFile(filename); //initializing file
+        solarSystem.writeToFilePER(filename, 0, thetaPrevious); //initializing file
         Integrator integrator(dt,method);
 
         for (int i=0; i<num_timesteps; i++)
         {
             integrator.integrateOneStep(solarSystem);
-            solarSystem.writeToFile(filename);
+
+            // Compute the current perihelion angle, using the inverse tangent function from cmath.
+            // This assumes there is a vector of planets, called m_bodies, available, in which the
+            // Sun is m_bodies[0] and Mercury is m_bodies[1].
+            double x = m_bodies[1].position.x() - m_bodies[0].position.x();
+            double y = m_bodies[1].position.y() - m_bodies[0].position.y();
+            thetaCurrent = atan2( y, x );
+
+            // Compute the current Mercury-Sun distance.
+            double rCurrent = (m_bodies[1].position - m_bodies[0].position).length();
+
+            // Check if the *previous* time step was a minimum for the Mercury-Sun distance. I.e. check
+            // if the previous distance is smaller than the current one *and* the previous previous one.
+            if ( rCurrent > rPrevious && rPrevious < rPreviousPrevious )
+                {
+
+                    // If we are perihelion, print angle (in radians) to terminal.
+                    //cout << "Perihelion angle: " << thetaPrevious << endl;
+
+                    // Here you should also probably write it to file for later plotting or something.
+                    solarSystem.writeToFilePER(filename, i, thetaPrevious); //writing to file
+                 }
+
+             // Update the helper variables (current, previous, previousPrevious).
+             rPreviousPrevious   = rPrevious;
+             rPrevious           = rCurrent;
+             thetaPrevious       = thetaCurrent;
         }
 
     }

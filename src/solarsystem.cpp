@@ -7,6 +7,7 @@ SolarSystem::SolarSystem() :
     m_kineticEnergy(0),
     m_potentialEnergy(0)
 {
+    pi = 3.14159265358979323846;
 }
 
 CelestialBody& SolarSystem::createCelestialBody(vec3 position, vec3 velocity, double mass) {
@@ -19,6 +20,7 @@ void SolarSystem::calculateForcesAndEnergy()
     m_kineticEnergy = 0;
     m_potentialEnergy = 0;
     m_angularMomentum.zeros();
+    m_momentum.zeros();
 
     for(CelestialBody &body : m_bodies) {
         // Reset forces on all bodies
@@ -33,16 +35,18 @@ void SolarSystem::calculateForcesAndEnergy()
             double dr = deltaRVector.length();
             // Calculate the force and potential energy here
 
-            vec3 force = -4*pow(3.141592654,2) * body1.mass * body2.mass / pow(dr,3) * deltaRVector;
+            vec3 force = -4*pi*pi* body1.mass * body2.mass / pow(dr,3) * deltaRVector;
             // see if 4pi^2 factor can be put outside to reduce flops + check minus sign
             // check directionality of deltaRVector, among other things
             body1.force += force;
             body2.force -= force; // this sign is correct, otherwise cannot get circular orbit in ES
 
             // Potential energy, check minus sign again
-            m_potentialEnergy += -4*pow(3.141592654,2) * body1.mass * body2.mass / dr;
+            m_potentialEnergy += -4*pi*pi * body1.mass * body2.mass / dr;
         }
 
+        m_momentum += body1.mass*body1.velocity;
+        m_angularMomentum += body1.position.cross(m_momentum);
         m_kineticEnergy += 0.5*body1.mass*body1.velocity.lengthSquared();
     }
 }
@@ -51,7 +55,6 @@ void SolarSystem::calculateForcesAndEnergyREL()
 {
     m_kineticEnergy = 0;
     m_potentialEnergy = 0;
-    m_angularMomentum.zeros();
 
     double c = 63239.7263; // AU/year
 
@@ -69,14 +72,14 @@ void SolarSystem::calculateForcesAndEnergyREL()
             double l = (body2.position.cross(body2.velocity)).length();
             // Calculate the force and potential energy here
 
-            vec3 force = -4*pow(3.141592654,2) * body1.mass * body2.mass / pow(dr,3) * (1 + (3*pow(l, 2))/(pow(dr,2)*pow(c, 2))) * deltaRVector;
+            vec3 force = -4*pi*pi * body1.mass * body2.mass / pow(dr,3) * (1 + (3*pow(l, 2))/(pow(dr,2)*pow(c, 2))) * deltaRVector;
             // see if 4pi^2 factor can be put outside to reduce flops + check minus sign
             // check directionality of deltaRVector, among other things
             body1.force += force;
             body2.force -= force; // this sign is correct, otherwise cannot get circular orbit in ES
 
             // Potential energy, check minus sign again
-            m_potentialEnergy += -4*pow(3.141592654,2) * body1.mass * body2.mass / dr;
+            m_potentialEnergy += -4*pi*pi * body1.mass * body2.mass / dr;
         }
 
         m_kineticEnergy += 0.5*body1.mass*body1.velocity.lengthSquared();
@@ -137,6 +140,11 @@ void SolarSystem::writeToFilePER(string filename, double i, double thetaPrevious
 vec3 SolarSystem::angularMomentum() const
 {
     return m_angularMomentum;
+}
+
+vec3 SolarSystem::momentum() const
+{
+    return m_momentum;
 }
 
 std::vector<CelestialBody> &SolarSystem::bodies()

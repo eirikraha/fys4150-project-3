@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
         int num_timesteps = 10/dt;
         // Creating filename
         string methodstr = method;
-        string filename = "../benchmarks/GM/ang_per"+methodstr;
+        string filename = "../benchmarks/GM/ang_per"+methodstr + "_dt" + to_string(dt);
 
         // Adding objects to the solar system
         solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the Sun

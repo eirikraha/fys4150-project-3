@@ -16,6 +16,7 @@ void Integrator::integrateOneStep(SolarSystem &system)
     /* Forward Euler */
     if (strcmp(num_method,"Euler")==0)
     {
+        system.calculateForcesAndEnergy();
         for (CelestialBody &body : system.bodies()) {
             body.position += body.velocity*m_dt;
             body.velocity += body.force / body.mass * m_dt;
@@ -25,12 +26,27 @@ void Integrator::integrateOneStep(SolarSystem &system)
     /* Velocity Verlet */
     if (strcmp(num_method,"Verlet")==0)
     {
+
         for(CelestialBody &body : system.bodies()) {
             vec3 accel1 = body.force/body.mass; // acceleration before updating x(i) to x(i+1)
             body.position += body.velocity*m_dt + 0.5 * accel1 * pow(m_dt,2);
 
             // Need to check if "force" = f/m or without div by m
             system.calculateForcesAndEnergy(); // updating forces at x(i+1)
+            body.velocity += 0.5* (accel1 + body.force / body.mass) * m_dt;
+        }
+    }
+
+    /* Velocity Verlet for relative case */
+    if (strcmp(num_method,"VerletREL")==0)
+    {
+    system.calculateForcesAndEnergyREL();
+        for(CelestialBody &body : system.bodies()) {
+            vec3 accel1 = body.force/body.mass; // acceleration before updating x(i) to x(i+1)
+            body.position += body.velocity*m_dt + 0.5 * accel1 * pow(m_dt,2);
+
+            // Need to check if "force" = f/m or without div by m
+            system.calculateForcesAndEnergyREL(); // updating forces at x(i+1)
             body.velocity += 0.5* (accel1 + body.force / body.mass) * m_dt;
         }
     }

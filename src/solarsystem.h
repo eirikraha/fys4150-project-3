@@ -12,6 +12,7 @@ public:
     SolarSystem();
     CelestialBody &createCelestialBody(vec3 position, vec3 velocity, double mass);
     void calculateForcesAndEnergy();
+    void calculateForcesAndEnergyREL();
     int numberOfBodies() const;
 
     double totalEnergy() const;

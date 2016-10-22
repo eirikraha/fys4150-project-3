@@ -20,15 +20,14 @@ int main(int argc, char *argv[])
     if (argc < 3 || argc > 5){
         cout<<"Usage: "<<argv[0]<<" Task"<<" dt"<<" task_param"<<" Method"<<endl;
         cout<<"Task and dt always required, task_param and Method optional and depends on Task."<<"\n\n";
-        cout<<"   Task : ES, ESesc,ESJ, WS or GM"<<endl;
+        cout<<"   Task : ES, ESJ, WS or GR"<<endl;
         cout<<"   ES : Earth-Sun system. The Sun is fixed to origo."<<endl;
-        cout<<"   ESesc: Earth-Sun system, find escape velocity. The Sun is fixed in origo." << endl;
         cout<<"   ESJ : Earth-Sun-Jupiter system. The Sun is fixed to origo."<<endl;
         cout<<"   WS : Whole solar system, including Pluto. The Sun is not fixed to origo."<<endl;
-        cout<<"   GM : General relativity with Mercury (not Freddie)."<<endl; //change this when we have understood the task.
+        cout<<"   GR : General relativity with Mercury (not Freddie)."<<endl; //change this when we have understood the task.
         cout<<"   dt : time step" << endl;
         cout<<"   task_param : Meaning depends on Task"<<endl;
-        cout<<"     -ES/ESesc : task_param is initial velocity of the Earth in y direction [AU/yr]."<<endl;
+        cout<<"     -ES : task_param is initial velocity of the Earth in y direction [AU/yr]."<<endl;
         cout<<"     -ESJ: task_param spesifies a number multiplied with mass of Jupiter to alter it."<<endl;
         cout<<"   Method : Euler or Verlet, set to Verlet if not specified" << endl;
         cout<<"    Note that Verlet is actually velocity Verlet, but the name is fairly long, hence the shortening."<<endl;
@@ -54,21 +53,15 @@ int main(int argc, char *argv[])
     int num_timesteps = 1000;
 
     /* TODO:
-     * - Maybe add folders in benchmarks for the different tasks, so as to make it more readable?
      * - Need to set up program with some sort of task structure
-     *   - 3b: earth-sun system, no solar motion, just write algorithms
      *
      *   - 3c: find initial value giving circular orbit (can be done by math?)
      *     - check stability for Euler's method and velocity Verlet for different dt
-     *     - check that both kinetic and potential energy is conserved in circular orbit (+ angular momentum?)
-     *     - time both ODE-solvers
-     *
-     *   - 3d: earth-sun, find escape velocity by trial and error
+     *     - check that both kinetic and potential energy is conserved in circular orbit (+ angular momentum?
      *
      *   - 3e: earth-sun-jupiter, sun still in (0,0,0)
      *     - see how much jupiter alters course. change m_j to different values
      *
-     *   - 3g: general relativistic correction (mercury!)
      */
 
     /////////////////////////////////////////////
@@ -105,13 +98,13 @@ int main(int argc, char *argv[])
         Integrator integrator(dt,method);
 
         //Access sun position so that we can keep it still
-        std::vector<CelestialBody> &m_bodies = solarSystem.bodies();
+        vector<CelestialBody> &m_bodies = solarSystem.bodies();
         CelestialBody &body = m_bodies[0];
 
-
         // Checking if kinetic and potential energy is conserved
-        double totalEnergy0 = solarSystem.totalEnergy();
-
+        double totalEnergy = solarSystem.totalEnergy();
+        vec3 momentum = solarSystem.momentum();
+        vec3 angularMomentum = solarSystem.angularMomentum();
 
         //start = clock();
         for (int i=0; i<num_timesteps; i++)
@@ -119,10 +112,18 @@ int main(int argc, char *argv[])
             integrator.integrateOneStep(solarSystem);
             body.position = vec3(0,0,0); // fixing the Sun to (0,0,0) each step
             solarSystem.writeToFile(filename);
-        }
 
-        double totE_end = solarSystem.totalEnergy();
-        cout<<totalEnergy0<<endl<<totE_end<<endl;
+            if (i%((int)(0.1*num_timesteps)) == 0)
+            {
+                totalEnergy = solarSystem.totalEnergy();
+                momentum = solarSystem.momentum();
+                angularMomentum = solarSystem.angularMomentum();
+                cout<<i<<endl<<"E_tot = "<<totalEnergy<<endl;
+                cout<<"p = "<<momentum.length()<<endl;
+                cout<<"L = "<<angularMomentum.length()<<endl;
+            }
+
+        }
 
         // Time calculation and write to file
         //finish = clock();
@@ -131,11 +132,6 @@ int main(int argc, char *argv[])
         //time_ofile<<"t = "<<setw(10)<<setprecision(8)<<time_duration<<"\n\n";
         //time_ofile.close();
 
-    }
-
-    else if(strcmp(argv[1], "ESesc") == 0)
-    {
-        cout << "Now these points of data make a beautiful line." << endl;
     }
 
     /////////////////////////////////////////////
@@ -148,6 +144,9 @@ int main(int argc, char *argv[])
         {
             factor = atof(argv[3]);
         }
+
+        num_timesteps = 2/dt;  // checking effect over 2 years
+
         // Creating filename
         string filename = "../benchmarks/ESJ/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_m"+to_string(factor)+".xyz";
 
@@ -173,7 +172,7 @@ int main(int argc, char *argv[])
         Integrator integrator(dt,method);
 
         //Access sun position so that we can keep it still
-        std::vector<CelestialBody> &m_bodies = solarSystem.bodies();
+        vector<CelestialBody> &m_bodies = solarSystem.bodies();
         CelestialBody &body = m_bodies[0];
 
         for (int i=0; i<num_timesteps; i++)
@@ -190,6 +189,13 @@ int main(int argc, char *argv[])
     /////////////////////////////////////////////
     else if(strcmp(argv[1], "WS") == 0)
     {
+        double years = 10; // the amount of years we want the program to run over
+        if (argc>3)
+        {
+            years = atof(argv[3]);
+        }
+        num_timesteps = (int)(years/dt);
+
         // Creating filename
         string filename = "../benchmarks/WS/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+".xyz";
 
@@ -208,7 +214,7 @@ int main(int argc, char *argv[])
         // Adding objects to the solar system
         vec3 pos_sun = vec3( 3.557522499727856E-03,  3.436899814085439E-03, -1.596344425455737E-04); // position [AU]
         vec3 vel_sun = vec3(-2.030857186518649E-06,  6.828431295519784E-06,  4.169177553390423E-08); // velocity [AU/day]
-        solarSystem.createCelestialBody(pos_sun, vel_sun, 1.0); // adding the Sun in solar system barycenter
+        solarSystem.createCelestialBody(pos_sun, vel_sun*365.25, 1.0); // adding the Sun in solar system barycenter
 
         // Adding Mercury
         vec3 pos_mercury = vec3(-3.879399114091706E-01, -2.710305092518798E-02,  3.326156756039202E-02); // position [AU]
@@ -255,6 +261,21 @@ int main(int argc, char *argv[])
         vec3 vel_pluto = vec3( 3.069571857572786E-03,  2.445305051568931E-04, -9.024173240192213E-04);    // velocity [AU/day]
         solarSystem.createCelestialBody(pos_pluto, vel_pluto*365.25, M_pluto); // adding Pluto
 
+        // Making sure the momentum is zero, correcting the velocity of the Sun
+        vector<CelestialBody> &m_bodies = solarSystem.bodies();
+        vec3 mom_tot = vec3(0,0,0);
+        vec3 mom_sun = m_bodies[0].mass*m_bodies[0].velocity;
+        for (unsigned int i=1; i<m_bodies.size(); i++)
+        {
+            mom_tot += m_bodies[i].mass*m_bodies[i].velocity;
+        }
+        m_bodies[0].velocity -= (mom_sun + mom_tot)/m_bodies[0].mass;
+
+        // Checking if kinetic and potential energy, momentum, and angular momentum is conserved
+        double totalEnergy = solarSystem.totalEnergy();
+        vec3 momentum = solarSystem.momentum();
+        vec3 angularMomentum = solarSystem.angularMomentum();
+
         // Integrating the system
         solarSystem.writeToFile(filename); //initializing file
         Integrator integrator(dt,method);
@@ -263,11 +284,22 @@ int main(int argc, char *argv[])
         {
             integrator.integrateOneStep(solarSystem);
             solarSystem.writeToFile(filename);
+
+            if (i%((int)(0.1*num_timesteps)) == 0)
+            {
+                totalEnergy = solarSystem.totalEnergy();
+                momentum = solarSystem.momentum();
+                angularMomentum = solarSystem.angularMomentum();
+                cout<<i<<endl<<"E_tot = "<<totalEnergy<<endl;
+                cout<<"p = "<<momentum.length()<<endl;
+                cout<<"L = "<<angularMomentum.length()<<endl;
+            }
+
         }
 
     }
 
-    else if(strcmp(argv[1], "GM") == 0)
+    else if(strcmp(argv[1], "GR") == 0)
     {
         int num_timesteps = 10/dt;
         // Creating filename
@@ -292,9 +324,9 @@ int main(int argc, char *argv[])
 
         double rPreviousPrevious 	= 0;	// Mercury-Sun-distance two times steps ago.
         double rPrevious            = 0;	// Mercury-Sun-distance of the previous time step.
-        double r                    = 0;	// Mercury-Sun-distance of the current time step.
+        double rCurrent             = 0;	// Mercury-Sun-distance of the current time step.
 
-        std::vector<CelestialBody> &m_bodies = solarSystem.bodies();
+        vector<CelestialBody> &m_bodies = solarSystem.bodies();
 
         // Integrating the system
         solarSystem.writeToFilePER(filename, 0, thetaPrevious); //initializing file
@@ -312,7 +344,7 @@ int main(int argc, char *argv[])
             thetaCurrent = atan2( y, x );
 
             // Compute the current Mercury-Sun distance.
-            double rCurrent = (m_bodies[1].position - m_bodies[0].position).length();
+            rCurrent = (m_bodies[1].position - m_bodies[0].position).length();
 
             // Check if the *previous* time step was a minimum for the Mercury-Sun distance. I.e. check
             // if the previous distance is smaller than the current one *and* the previous previous one.

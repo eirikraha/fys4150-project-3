@@ -32,12 +32,12 @@ if __name__=='__main__':
     except IndexError:
         task = 'ES'
 
-    N = 1000 # need this, need to change naming convention of files
+    N = 2000 # need this, need to change naming convention of files
     # if name contains N, we could just fill arrays instead of lists
 
     # Plot ES
     if task=='ES':
-        filename = '../benchmarks/ES/pos_Euler_dt0.001000_N1000_vy6.280000.xyz'
+        filename = '../benchmarks/ES/pos_Verlet_dt0.001000_N2000_vy8.886000.xyz'
         positions = read_file(filename,N)
 
         plot(positions[0][0,0],positions[0][0,1],'oy',ms=20,label='Sun')
@@ -50,8 +50,8 @@ if __name__=='__main__':
         title('Earth-Sun system',size=17)
         grid('on')
         legend(numpoints=1,fontsize=14)
-        xlim([-1.1,1.1])
-        ylim([-1.1,1.1])
+        #xlim([-1.1,1.1])
+        #ylim([-1.1,1.1])
         savefig('../figures/earth_sun.png')
         show()
 

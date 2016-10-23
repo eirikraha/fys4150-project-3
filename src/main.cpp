@@ -24,12 +24,12 @@ int main(int argc, char *argv[])
         cout<<"   ES : Earth-Sun system. The Sun is fixed to origo."<<endl;
         cout<<"   ESJ : Earth-Sun-Jupiter system. The Sun is fixed to origo."<<endl;
         cout<<"   WS : Whole solar system, including Pluto. The Sun is not fixed to origo."<<endl;
-        cout<<"   GR : General relativity with Mercury (not Freddie)."<<endl; //change this when we have understood the task.
+        cout<<"   GR : Sun-Mercury system with a general relativity correction to the gravitational force."<<endl;
         cout<<"   dt : time step" << endl;
         cout<<"   task_param : Meaning depends on Task"<<endl;
         cout<<"     -ES : task_param is initial velocity of the Earth in y direction [AU/yr]."<<endl;
         cout<<"     -ESJ: task_param spesifies a number multiplied with mass of Jupiter to alter it."<<endl;
-        cout<<"   Method : Euler or Verlet, set to Verlet if not specified" << endl;
+        cout<<"   Method : Euler, Verlet or Verlet with a general relativity term, set to Verlet if not specified" << endl;
         cout<<"    Note that Verlet is actually velocity Verlet, but the name is fairly long, hence the shortening."<<endl;
         exit(1);
     }
@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
 
     else if(strcmp(argv[1], "GR") == 0)
     {
-        int num_timesteps = 10/dt;
+        int num_timesteps = 100/dt;
         // Creating filename
         string methodstr = method;
         string filename = "../benchmarks/GM/ang_per"+methodstr + "_dt" + to_string(dt);
@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
         double M_sun = 2e30;             // mass of the Sun in kg
         double M_mercury = 2.4e23/M_sun;       // mass of Mercury in kg
 
-        // Adding the Earth
+        // Adding Mercury
         vec3 pos_M = vec3(0.3075, 0, 0);  // position [AU]
         vec3 vel_M = vec3(0, 12.44, 0); // velocity [AU/year]
         solarSystem.createCelestialBody(pos_M, vel_M, M_mercury); // adding Mercury
@@ -350,10 +350,6 @@ int main(int argc, char *argv[])
             // if the previous distance is smaller than the current one *and* the previous previous one.
             if ( rCurrent > rPrevious && rPrevious < rPreviousPrevious )
                 {
-
-                    // If we are perihelion, print angle (in radians) to terminal.
-                    //cout << "Perihelion angle: " << thetaPrevious << endl;
-
                     // Here you should also probably write it to file for later plotting or something.
                     solarSystem.writeToFilePER(filename, i, thetaPrevious); //writing to file
                  }

@@ -264,6 +264,18 @@ We can then find the perihelion angle by
 \end{equation}
 where $y_p$ and $x_p$ are $y$ and $x$ respectively at perihelion.
 \subsection{Experimental}
+The programs used in this project can be found in the GitHub repository \cite{Github}, in the \texttt{/src/} folder. When running the program, it takes 4 command line arguments, \texttt{task}, $dt$, \texttt{task parameter} and \texttt{method}. The program has four different runmodes, which we will discuss in some more detail. All data written to file by the program are stored in \texttt{/benchmarks/} with different subfolders for each runmode.
+\subsubsection*{Earth-Sun system}
+Setting \texttt{task} to \texttt{ES} runs the program for a two-body solar system containing the Earth and the Sun which is fixed in origo. The Earth starts at a distance of 1 AU from the Sun along  the x-axis and \texttt{task parameter} gives its initial velocity in the y-direction. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet} for using either forward Euler or Velocity Verlet . The position vectors of the Sun and the Earth are saved in the file \texttt{ES/pos\_<method>\_dt<dt>\_N<number of timesteps>\_vy<initial velocity in y-direction>.xyz}\\ where everything inside a \texttt{<>} means the value given for that run through.
+\subsubsection*{Earth-Sun-Jupiter system}
+Setting \texttt{task} to \texttt{ESJ} runs the program for a three-body solar system containing the Earth, Jupiter and the Sun which is fixed \husk{Is it fixed?} in origo. \texttt{Task parameter} gives a factor to multpily with Jupiters mass. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet}. 
+Positions of all celestial bodies are written to the file \\ \texttt{ESJ/pos\_dt<dt>\_N<number of timesteps>\_m<mass factor>.xyz}
+\subsubsection*{Whole solar system}
+Setting \texttt{task} to \texttt{WS} runs the program for a solar system containing the Sun, all the planets and Pluto revolving around the centre of mass. \texttt{Task parameter} sets the number of years one wants the simulation to run. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet}. The position of all celestial bodies are written to the file \\ 
+\texttt{WS/pos\_dt<dt>\_N<number of timesteps>.xyz}
+\subsubsection*{Perhelion precession}
+Setting \texttt{task} to \texttt{GR} runs the program for a two-body solar system containing Mercury and the Sun. \texttt{Task parameter} sets the number of years one wants the simulation to run. \husk{Remember to change this in the program!} \texttt{Method} can be set to either \texttt{Euler}, \texttt{Verlet} or \texttt{VerletREL} where the latter uses Velocity Verlet with a relativistic correction to the gravitation force. The perhelion angle is saved to the file
+\texttt{GR/ang\_per<method>\_dt<dt>}
 \subsection{Results}
 \subsubsection*{Perihelion precession}
 By using Verlet twice, first with acceleration given by equation \eqref{eq:FG_comp} and then by the component version of equation \eqref{eq:FgGR}, we can compare the perihelion angles. By setting the velocity to 12.44 AU/year, and the initial position to be (0.3075, 0, 0) AU we found \husk{Fyll in her med figur}

@@ -301,10 +301,21 @@ int main(int argc, char *argv[])
 
     else if(strcmp(argv[1], "GR") == 0)
     {
-        int num_timesteps = 100/dt;
+        double years = 100; // the amount of years we want the program to run over
+        if (argc>3)
+        {
+            years = atof(argv[3]);
+        }
+        num_timesteps = (int)(years/dt);
+
+        //makes dt a string on scientific form
+        stringstream ss;
+        ss << scientific << setprecision(1) << dt;
+        string dtstr = ss.str();
+
         // Creating filename
         string methodstr = method;
-        string filename = "../benchmarks/GM/ang_per"+methodstr + "_dt" + to_string(dt);
+        string filename = "../benchmarks/GR/ang_per"+methodstr + "_dt" + dtstr + "_years" + to_string(years);
 
         // Adding objects to the solar system
         solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the Sun

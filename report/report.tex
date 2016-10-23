@@ -246,7 +246,7 @@ As we can see, the term for $v_{i+1}$ is dependent on $a_{i+1}$. Therefore the a
 \end{algorithm}
 Where we calculate $F_{G, r}$ by euation \eqref{eq:FG_comp}. \husk{Should we change to the one we actually use?}
 \subsubsection{Perihelion precession}
-Lastly we want to study the perihelion angle of Mercury. This was an important test of the general relativity. When one compared the observed value of the perhelion precession to all classical effects, there was a difference of about 43 arcseconds after a century. This difference was not understood until Einstein predicted it with general relativity. Einstein found that the perihelion precession could be predicted by:
+Lastly we want to study the perihelion angle of Mercury. This was an important test of the general relativity. When one compared the observed value of the perhelion precession to all classical effects, there was a difference of about 43 arcseconds after a century. This difference was not understood until Einstein predicted it with general relativity.\husk{REF:\url{https://en.wikipedia.org/wiki/Apsidal_precession}} Einstein found that the perihelion precession could be predicted by:
 \begin{equation}
 \epsilon = 24 \pi^3 \frac{\alpha^2}{T^2 c^2 (1 - e^2)}
 \label{eq:perihelion}
@@ -265,20 +265,36 @@ We can then find the perihelion angle by
 where $y_p$ and $x_p$ are $y$ and $x$ respectively at perihelion.
 \subsection{Experimental}
 The programs used in this project can be found in the GitHub repository \cite{Github}, in the \texttt{/src/} folder. When running the program, it takes 4 command line arguments, \texttt{task}, $dt$, \texttt{task parameter} and \texttt{method}. The program has four different runmodes, which we will discuss in some more detail. All data written to file by the program are stored in \texttt{/benchmarks/} with different subfolders for each runmode.
-\subsubsection*{Earth-Sun system}
+\subsubsection*{The Earth-Sun system}
 Setting \texttt{task} to \texttt{ES} runs the program for a two-body solar system containing the Earth and the Sun which is fixed in origo. The Earth starts at a distance of 1 AU from the Sun along  the x-axis and \texttt{task parameter} gives its initial velocity in the y-direction. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet} for using either forward Euler or Velocity Verlet . The position vectors of the Sun and the Earth are saved in the file \texttt{ES/pos\_<method>\_dt<dt>\_N<number of timesteps>\_vy<initial velocity in y-direction>.xyz}\\ where everything inside a \texttt{<>} means the value given for that run through.
-\subsubsection*{Earth-Sun-Jupiter system}
+\subsubsection*{The Earth-Sun-Jupiter system}
 Setting \texttt{task} to \texttt{ESJ} runs the program for a three-body solar system containing the Earth, Jupiter and the Sun which is fixed \husk{Is it fixed?} in origo. \texttt{Task parameter} gives a factor to multpily with Jupiters mass. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet}. 
 Positions of all celestial bodies are written to the file \\ \texttt{ESJ/pos\_dt<dt>\_N<number of timesteps>\_m<mass factor>.xyz}
-\subsubsection*{Whole solar system}
+\subsubsection*{The whole Solar System}
 Setting \texttt{task} to \texttt{WS} runs the program for a solar system containing the Sun, all the planets and Pluto revolving around the centre of mass. \texttt{Task parameter} sets the number of years one wants the simulation to run. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet}. The position of all celestial bodies are written to the file \\ 
 \texttt{WS/pos\_dt<dt>\_N<number of timesteps>.xyz}
 \subsubsection*{Perhelion precession}
 Setting \texttt{task} to \texttt{GR} runs the program for a two-body solar system containing Mercury and the Sun. \texttt{Task parameter} sets the number of years one wants the simulation to run. \husk{Remember to change this in the program!} \texttt{Method} can be set to either \texttt{Euler}, \texttt{Verlet} or \texttt{VerletREL} where the latter uses Velocity Verlet with a relativistic correction to the gravitation force. The perhelion angle is saved to the file
 \texttt{GR/ang\_per<method>\_dt<dt>}
 \subsection{Results}
+\subsubsection*{The Earth-Sun system}
+
+\subsubsection*{The Earth-Sun-Jupiter system}
+\subsubsection*{The whole Solar System}
+Simulating the Solar System with the Sun, all eight planets and Pluto gave us the results presented in figure \ref{fig:wholesystem}
+%\begin{figure}[H]
+%\centering
+%\includegraphics[scale=0.5]{•}
+%\end{figure}
 \subsubsection*{Perihelion precession}
-By using Verlet twice, first with acceleration given by equation \eqref{eq:FG_comp} and then by the component version of equation \eqref{eq:FgGR}, we can compare the perihelion angles. By setting the velocity to 12.44 AU/year, and the initial position to be (0.3075, 0, 0) AU we found \husk{Fyll in her med figur}
+By using Verlet twice, first with acceleration given by equation \eqref{eq:FG_comp} and then by the component version of equation \eqref{eq:FgGR}, we could compare the perihelion angles. With dt = $1e-7$, initial velocity in y-direction for Mercury = 12.44 AU/year, initial position for Mercury = (0.3075, 0, 0) and letting the simulation run for a century we found the results presented in figure \ref{fig:perhelion}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{../figures/perheliondt1e-7.png}
+\caption{The difference of perhelion angle for the classical and the general relativity case over a century with time step = $1\E{-7}$. The x-axis gives revolutions around the Sun and the y-axis shows the difference in radians.}
+\label{fig:perhelion}
+\end{figure}
+As we can see from figure \ref{fig:perhelion} the difference is about $-2.0 \E{-4}$ after Mercury has revolved about 415 times around the Sun. 
 \subsection{Discussion}
 \subsection{Conclusion}
 \end{document}

@@ -22,7 +22,8 @@ int main(int argc, char *argv[])
         cout<<"Task and dt always required, task_param and Method optional and depends on Task."<<"\n\n";
         cout<<"   Task : ES, ESJ, WS or GR"<<endl;
         cout<<"   ES : Earth-Sun system. The Sun is fixed to origo."<<endl;
-        cout<<"   ESJ : Earth-Sun-Jupiter system. The Sun is fixed to origo."<<endl;
+        cout<<"   ESJ1 : Earth-Sun-Jupiter system. The Sun is fixed to origo."<<endl;
+        cout<<"   ESJ2 : Earth-Sun-Jupiter system. Sun not fixed to origo, total momentum fixed to 0."<<endl;
         cout<<"   WS : Whole solar system, including Pluto. The Sun is not fixed to origo."<<endl;
         cout<<"   GR : Sun-Mercury system with a general relativity correction to the gravitational force."<<endl;
         cout<<"   dt : time step" << endl;
@@ -50,19 +51,9 @@ int main(int argc, char *argv[])
 
     SolarSystem solarSystem; // initializing solar system
     double dt = atof(argv[2]);
+    int max_steps = 1000; // max steps to save to file
+    int iter=1;
     int num_timesteps = 1000;
-
-    /* TODO:
-     * - Need to set up program with some sort of task structure
-     *
-     *   - 3c: find initial value giving circular orbit (can be done by math?)
-     *     - check stability for Euler's method and velocity Verlet for different dt
-     *     - check that both kinetic and potential energy is conserved in circular orbit (+ angular momentum?
-     *
-     *   - 3e: earth-sun-jupiter, sun still in (0,0,0)
-     *     - see how much jupiter alters course. change m_j to different values
-     *
-     */
 
     /////////////////////////////////////////////
     ///    Earth-Sun system, Sun is fixed     ///
@@ -77,6 +68,7 @@ int main(int argc, char *argv[])
 
         // Finding number of time steps based on how many years we want the program to run
         num_timesteps = 1/dt; // 1 yr / dt [yr]
+        iter = num_timesteps/max_steps;
 
         // Creating filename for this task
         string meth = method;
@@ -111,7 +103,8 @@ int main(int argc, char *argv[])
         {
             integrator.integrateOneStep(solarSystem);
             body.position = vec3(0,0,0); // fixing the Sun to (0,0,0) each step
-            solarSystem.writeToFile(filename);
+
+            if (i%iter == 0) solarSystem.writeToFile(filename); // only write to file every iter steps
 
             if (i%((int)(0.1*num_timesteps)) == 0)
             {
@@ -137,7 +130,7 @@ int main(int argc, char *argv[])
     /////////////////////////////////////////////
     ///    Earth-Sun-Jupiter, Sun is fixed    ///
     /////////////////////////////////////////////
-    else if(strcmp(argv[1], "ESJ") == 0)
+    else if(strcmp(argv[1], "ESJ1") == 0 || strcmp(argv[1], "ESJ2") == 0)
     {
         double factor = 1.0; // factor to scale the mass of Jupiter
         if (argc>3)
@@ -145,10 +138,11 @@ int main(int argc, char *argv[])
             factor = atof(argv[3]);
         }
 
-        num_timesteps = 2/dt;  // checking effect over 2 years
+        num_timesteps = 12/dt;  // checking effect over 12 years
+        iter = num_timesteps/max_steps;
 
         // Creating filename
-        string filename = "../benchmarks/ESJ/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_m"+to_string(factor)+".xyz";
+        string filename = "../benchmarks/"+(string)argv[1]+"/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_m"+to_string(factor)+".xyz";
 
         // Adding objects to the solar system
         solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the Sun
@@ -166,7 +160,7 @@ int main(int argc, char *argv[])
         // Adding Jupiter
         vec3 pos_jupiter = vec3(-5.426315241208865E+00, -4.822215431711254E-01, 1.233572936426657E-01);   // position [AU]
         vec3 vel_jupiter = vec3( 5.810683650779558E-04, -7.160289109931362E-03, 1.675759064981599E-05);   // velocity [AU/day]
-        solarSystem.createCelestialBody(pos_jupiter, vel_jupiter*365.25, M_jupiter); // adding Jupiter
+        solarSystem.createCelestialBody(pos_jupiter, vel_jupiter*365.25, factor*M_jupiter); // adding Jupiter
 
         solarSystem.writeToFile(filename); //initializing file
         Integrator integrator(dt,method);
@@ -175,11 +169,23 @@ int main(int argc, char *argv[])
         vector<CelestialBody> &m_bodies = solarSystem.bodies();
         CelestialBody &body = m_bodies[0];
 
+        // Making sure the momentum is zero, correcting the velocity of the Sun
+        if (strcmp(argv[1],"ESJ2") == 0)
+        {
+            vec3 mom_tot = vec3(0,0,0);
+            vec3 mom_sun = body.mass*body.velocity;
+            for (unsigned int i=1; i<m_bodies.size(); i++)
+            {
+                mom_tot += m_bodies[i].mass*m_bodies[i].velocity;
+            }
+            body.velocity -= (mom_sun + mom_tot)/body.mass;
+        }
+
         for (int i=0; i<num_timesteps; i++)
         {
             integrator.integrateOneStep(solarSystem);
-            body.position = vec3(0,0,0); // fixing the Sun to (0,0,0) each step
-            solarSystem.writeToFile(filename);
+            if (strcmp(argv[1],"ESJ1")==0) body.position = vec3(0,0,0); // fixing the Sun to (0,0,0) each step
+            if (i%iter == 0) solarSystem.writeToFile(filename); // only write to file every iter steps
         }
 
     }
@@ -195,6 +201,7 @@ int main(int argc, char *argv[])
             years = atof(argv[3]);
         }
         num_timesteps = (int)(years/dt);
+        iter = num_timesteps/max_steps;
 
         // Creating filename
         string filename = "../benchmarks/WS/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+".xyz";
@@ -283,7 +290,7 @@ int main(int argc, char *argv[])
         for (int i=0; i<num_timesteps; i++)
         {
             integrator.integrateOneStep(solarSystem);
-            solarSystem.writeToFile(filename);
+            if (i%iter == 0) solarSystem.writeToFile(filename); // only write to file every iter steps
 
             if (i%((int)(0.1*num_timesteps)) == 0)
             {

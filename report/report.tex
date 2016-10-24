@@ -148,26 +148,26 @@ If the difference is about 43 arcseconds after a century, we will have affirmed 
 \subsection{Theory}
 The goal of this project, is to develop a model of our solar system using the so-called velocity Verlet algorithm for solving coupled ordinary differential equations. For our solar system model, the only force interacting on it is gravity.
 \subsubsection{The Earth-Sun system}
-To start off, we simplify by looking at a hypothetical solar system with only the Earth orbiting around the Sun, where any solar motion is small enough to be neglected. Since the only force working on the system is the gravitational force between the Sun and the Earth, Newton's law of gravitation gives us that
+To start off, we simplify by looking at a hypothetical solar system with only the Earth orbiting around the Sun, where any solar motion is small enough to be neglected. Newton's law of gravitation, gives us then
 \begin{align*}
-  F_G &= \frac{GM_{\odot}M_{\text{E}}}{r^2}
-\intertext{where $M_{\odot}$ is the solar mass, $M_{\text{E}}$ is the mass of the Earth, $G$ the gravitational constant, and $r$ is the distance between the Earth and the Sun. Written on vector form, $F_G$ takes the following form}
-  F_{G,\mathbf{r}} &= -\frac{GM_{\odot}M_{\text{E}}}{r^3}\,\mathbf{r}
+  F_G &= \frac{GM_{\odot}M_{\text{Earth}}}{r^2}
+\intertext{where $M_{\odot}$ is the solar mass, $M_{\text{Earth}}$ is the mass of the Earth, $G$ the gravitational constant, and $r$ is the distance between the Earth and the Sun. Written on component form, $F_G$ takes the following form}
+  F_{G,\mathbf{r}} &= \frac{GM_{\odot}M_{\text{Earth}}}{r^3}\,\mathbf{r}
 \end{align*}
- where $\mathbf{r} = x\mathbf{i}+y\mathbf{j}+z\mathbf{k}$ is the vector from the Sun to the Earth.
+ where $\mathbf{r} = x\mathbf{i}+y\mathbf{j}+z\mathbf{k}$ is the vector between the Sun and the Earth.
 \begin{align*}
-  F_{G,\mathbf{r}} &= -\frac{GM_{\odot}M_{\text{E}}}{r^3}\,(x\mathbf{i}+y\mathbf{j}+z\mathbf{k})\numberthis\label{eq:FG_comp}
+  F_{G,\mathbf{r}} &= \frac{GM_{\odot}M_{\text{Earth}}}{r^3}\,(x\mathbf{i}+y\mathbf{j}+z\mathbf{k})\numberthis\label{eq:FG_comp}
 \end{align*}
 \\Using Newton's second law of motion, we can then get the following differential equations for the motion of the Earth.
 \begin{align*}
-  \frac{d^2x}{dt^2} = \frac{F_{G,x}}{M_{E}}\numberthis\label{eq:diffx}\\
-  \frac{d^2y}{dt^2} = \frac{F_{G,y}}{M_{E}}\numberthis\label{eq:diffy}\\
-  \frac{d^2z}{dt^2} = \frac{F_{G,z}}{M_{E}}\numberthis\label{eq:diffz}
+  \frac{d^2x}{dt^2} = \frac{F_{G,x}}{M_{Earth}}\numberthis\label{eq:diffx}\\
+  \frac{d^2y}{dt^2} = \frac{F_{G,y}}{M_{Earth}}\numberthis\label{eq:diffy}\\
+  \frac{d^2z}{dt^2} = \frac{F_{G,z}}{M_{Earth}}\numberthis\label{eq:diffz}
 \end{align*}
-where $F_{G,x}$, $F_{G,y}$, and $F_{G,z}$ are the components of the gravitational force, given by \eqref{eq:FG_comp}. We can assume that the orbit of the Earth (and other objects in the solar system) around the Sun is mostly co-planar, so we could take this to be the $xy$-plane, reducing our differential equations to equations \eqref{eq:diffx} and \eqref{eq:diffy}. However, since looking at the system in three dimensions isn't that much more work, we will continue doing so.\\\\
-We can obtain mass units from assuming that the Earth's orbit is almost circular around the Sun. For circular motion, we know that the force obeys the following relation
+where $F_{G,x}$, $F_{G,y}$, and $F_{G,z}$ are the components of the gravitational force, given by \eqref{eq:FG_comp}. We can assume that the orbit of the Earth (and other objects in the solar system) around the Sun is mostly co-planar, so we could take this to be the $xy$-plane, reducing our differential equations to equations \eqref{eq:diffx} and \eqref{eq:diffy}. However, since looking at the equations in three dimensions isn't that much more work, we will continue doing so.\\\\
+We can obtain mass units from using that Earth's orbit is almost circular around the Sun. For circular motion, we know that the force obeys the following relation
 \begin{align*}
-F_G &= \frac{M_{\text{E}}v^2}{r} = \frac{GM_{\odot}M_{\text{E}}}{r^2}
+F_G &= \frac{M_{\text{Earth}}v^2}{r} = \frac{GM_{\odot}M_{\text{Earth}}}{r^2}
 \end{align*}
 where $v$ is the velocity of the Earth. This can be shown to give us the useful relation
 \begin{align*}
@@ -175,50 +175,16 @@ where $v$ is the velocity of the Earth. This can be shown to give us the useful 
 \end{align*}
 which we can use to scale both distance and time units to more ideal orders of magnitudes. One astronomical unit (1 AU) is defined as the average distance from the Earth to the Sun, or roughly $10^{11}$ m. Inserting this into equation \eqref{eq:FG_comp}, gives us
 \begin{align*}
-  F_{G,\mathbf{r}} &= \frac{4\pi^2\text{AU}^3/\text{yr}^2\,M_{\text{E}}}{r^3}(x\mathbf{i}+y\mathbf{j}+z\mathbf{k})
+  F_{G,\mathbf{r}} &= \frac{4\pi^2\text{AU}^3/\text{yr}^2\,M_{\text{Earth}}}{r^3}(x\mathbf{i}+y\mathbf{j}+z\mathbf{k})
 \end{align*} 
-where $r$ now is given in units AU, and time is given in years. Using years instead of seconds matches the time evolution of our solar system better, as the Earth for example orbits the Sun once per year.
+where $r$ now is given in units AU. \red{not fully satisfied here, try to add some more about how scaling is nice, or just some other shit.}
 \\\\
-By looking at equation \eqref{eq:mass_units}, we realize that the velocity required for circular orbit falls out
-\begin{align*}
-  v_{\text{circ}}^2r &= 4\pi^2\text{AU}^3/\text{yr}^2\\
-  v_{\text{circ}} &=2\pi\sqrt{\frac{\text{AU}^3}{r}}\,\text{yr}^{-1}\numberthis\label{eq:v_circ}
-\end{align*}
-For our Earth, which lies at $r = 1$ AU, equation \eqref{eq:v_circ} gives us $v_{\text{circ}} = 2\pi$.\\\\
-The total energy of the Earth can be given as $E_{\text{tot,E}} = T_{\text{E}} + U_{\text{E}}$, where
-\begin{align*}
-  T_{\text{E}} &= \frac{1}{2}M_{\text{E}}v_{\text{E}}^2
-  \intertext{is the kinetic energy for the Earth, and the potential energy is $U$ of the Earth in our system given as}
-  U_{\text{E}} &= \frac{GM_{\odot}M_{\text{E}}}{r}\\
-  &= \frac{4\pi^2\text{AU}^3/\text{yr}^2\,M_{\text{E}}}{r}
-\end{align*}
-where $r$ is the distance given in AU. From this we can find the escape velocity, which is the initial velocity an object needs to escape from its orbit. This occurs when the kinetic energy is equal the potential energy. For the Earth, this is
-\begin{align*}
-  T_{\text{E}} &= U_{\text{E}}\\
-  \frac{1}{2}M_{\text{E}}v_{\text{esc}}^2 &= \frac{GM_{\odot}M_{\text{E}}}{r}\\
-  v_{\text{esc}} &= \sqrt{\frac{2GM_{\odot}}{r}}\numberthis\label{eq:v_esc}
-  \intertext{Inserting $r = 1$ AU and our result from equation \eqref{eq:mass_units}, we get}
-  v_{\text{esc}} &= 2\sqrt{2}\,\pi\,\text{AU}/\text{yr}
-\end{align*}
-or expressed in terms of the circular orbit velocity $v_{\text{esc}} = \sqrt{2}\,v_{\text{circ}}$.\\\\
-In order to solve the differential equations (equations \eqref{eq:diffx}, \eqref{eq:diffy}, and \eqref{eq:diffz}) numerically, we need to discretize them. For simplicity, we will only derive the discretized expression for the $x$-direction, though the derivation is the same for the other directions. In the non-discretized situation, the position of an object in the $x$-direction is given by $x(t)$, where $t$ is the time. We start by discretizing the time by defining the time steps $t_i$ in the interval $t_1 \dots t_n$, so
-\begin{align*}
-  t_i =  t_1 +  ih
-\end{align*}
-where $h$ is the step length and $i = 0,1,\dots,n$, so that we can write $t_{i+1} = t_i + h$. Now, we can write $x(t)$ in terms of the discretized time, $x(t_i)$. We can simplify the notation by writing $x(t_i)$ as $x_i$. Inserting this into equation \eqref{eq:FG_comp} gives us
-\begin{align*}
-  F_{G,x_i} &= -\frac{GM_{\odot}M_{\text{E}}}{r^3}\,x_i
-\end{align*}
-We then get the discretized differential equation for $x$ from equation \eqref{eq:diffx}
-\begin{align*}
-  x_i'' &= -\frac{GM_{\odot}}{r^3}x_i
-\end{align*}
-Or when inserting the expression for $GM_{\odot}$ from equation \eqref{eq:mass_units}
-\begin{align*}
-  x_i'' &= -\frac{4\pi^2 \text{AU}^3/\text{yr}^2}{r^3}\,x_i \numberthis\label{eq:discx}
-\end{align*}
+\red{might want to discretize in the section about numerically solving, or just do it here?}In order to solve the differential equations given by equations \eqref{eq:diffx}, \eqref{eq:diffy} and \eqref{eq:diffz} numerically, we need to discretize them. For simplicity, we look at only the $x$ direction, though exactly the same can be done for the $y$ and $z$ directions. We define $x$ in the interval $x_{\text{min}} \dots x_{\text{max}}$. We define the step length $h$, so that we can discretize $x$ as $x_i$, where\red{meh}
+\subsubsection{The three-body problem}
+\red{adding jupyter}
+\subsubsection{Potential energy/circular orbit/escape velocity?}
 
-\subsubsection{Numerical methods for solving ordinary differential equations}
+\subsubsection{Numerically solving ordinary differential equations}
 Euler's forward method \husk{REF!} is a well known numerical method used to solve differential equations. The method is fairly simple, basing itself on that the next step is the former step added with its own derivative times a steplength. By defining $h$ as the step length we can write express Euler's forward method as follows:
 \begin{equation}
 f_{i + 1} = f_i + f^{'}_i \cdot h
@@ -230,11 +196,22 @@ In our case we use Newton's laws and we want to find the position and velocity o
 v_{i + 1} = v_i + h \cdot a_i + \mathcal{O}(h^2)\\
 \label{eq:Eulervel}
 \end{equation}
-\husk{Uncertain about the error, check before delivery}
 \begin{equation}
-x_{i + 1} = x_i + h \cdot v_i + \mathcal{O}(h^3)\\
+x_{i + 1} = x_i + h \cdot v_i + \mathcal{O}(h^2)\\
 \label{eq:Eulerpos}
 \end{equation}
+We can implement the algorithm as follows:
+\begin{algorithm}[H]
+\small
+\caption{Forward Euler}\label{alg:VelVerlet}
+\begin{algorithmic}[1]
+\For{$i = 0, n$}
+\State $v_{i+1} = v_i + h\cdot a_i $
+\State $x_{i+1} = x_i + h\cdot v_i $
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+Where we calculate $F_{G, r_i}$ with equation \eqref{eq:FG_comp}.By counting we can see that this gives us 4n FLOPs. \\ \\
 The Verlet Velocity method presents a different approach to solve the differential equations in this project. While Euler's method is applicable to many differential equations, the Verlet methods are specified to solve Newton's equations of motion \husk{REF}. The Verlet Velocity method is derived by first Taylor expanding $x_{i + 1}$ ad $x_{i-1}$:
 \begin{align*}
 x_{i-1} &\simeq x_i - v_i h + \frac{1}{2}a_i h^2 \\
@@ -258,11 +235,11 @@ v_{i+1} &= v_i + \frac{1}{2} a_i h + \frac{1}{2} a_{i+1} h \\
 \end{align*}
 This gives us the equations for position and velocity in the velocity Verlet method:
 \begin{equation}
-x_{i+1} = x_i + v_i h + \frac{1}{2} a_i h^2
+x_{i+1} = x_i + v_i h + \frac{1}{2} a_i h^2 + \mathcal{O}(h^3)
 \label{eq:Verletpos}
 \end{equation}
 \begin{equation}
-v_{i+1} = v_i + \frac{1}{2} h (a_i + a_{i+1})
+v_{i+1} = v_i + \frac{1}{2} h (a_i + a_{i+1}) + \mathcal{O}(h^3)
 \label{eq:Verletvel}
 \end{equation}
 As we can see, the term for $v_{i+1}$ is dependent on $a_{i+1}$. Therefore the algorithm must go like this:
@@ -271,18 +248,13 @@ As we can see, the term for $v_{i+1}$ is dependent on $a_{i+1}$. Therefore the a
 \caption{Velocity Verlet}\label{alg:VelVerlet}
 \begin{algorithmic}[1]
 \For{$i = 0, n$}
-\State $a_i = F_{G, r_i}/m$
-\State $r_i = r_i + v_i h + \frac{1}{2} a_i h^2$
+\State $r_{i+1} = r_i + v_i h + \frac{1}{2} a_i h^2$
 \State $a_{i+1} = F_{G, r_{i+1}}/m$
 \State $v_{i+1} = v_i + \frac{1}{2} h (a_i + a_{i+1})$
 \EndFor
 \end{algorithmic}
 \end{algorithm}
-Where we calculate $F_{G, r}$ by euation \eqref{eq:FG_comp}. \husk{Should we change to the one we actually use?}
-
-\subsubsection{The three-body problem}
-\red{adding jupyter}
-
+Where we calculate $F_{G, r}$ with euation \eqref{eq:FG_comp}. By counting we can see that we have 11 FLOPs  which is a bit more than the double of forward Euler. \husk{Should we change to the one we actually use?}
 \subsubsection{Perihelion precession}
 Lastly we want to study the perihelion angle of Mercury. This was an important test of the general relativity. When one compared the observed value of the perhelion precession to all classical effects, there was a difference of about 43 arcseconds after a century. This difference was not understood until Einstein predicted it with general relativity.\husk{REF:\url{https://en.wikipedia.org/wiki/Apsidal_precession}} Einstein found that the perihelion precession could be predicted by:
 \begin{equation}
@@ -306,13 +278,13 @@ The programs used in this project can be found in the GitHub repository \cite{Gi
 \subsubsection*{The Earth-Sun system}
 Setting \texttt{task} to \texttt{ES} runs the program for a two-body solar system containing the Earth and the Sun which is fixed in origo. The Earth starts at a distance of 1 AU from the Sun along  the x-axis and \texttt{task parameter} gives its initial velocity in the y-direction. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet} for using either forward Euler or Velocity Verlet . The position vectors of the Sun and the Earth are saved in the file \texttt{ES/pos\_<method>\_dt<dt>\_N<number of timesteps>\_vy<initial velocity in y-direction>.xyz}\\ where everything inside a \texttt{<>} means the value given for that run through.
 \subsubsection*{The Earth-Sun-Jupiter system}
-Setting \texttt{task} to \texttt{ESJ} runs the program for a three-body solar system containing the Earth, Jupiter and the Sun which is fixed \husk{Is it fixed?} in origo. \texttt{Task parameter} gives a factor to multpily with Jupiters mass. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet}. 
+Setting \texttt{task} to \texttt{ESJ1} runs the program for a three-body solar system containing the Earth, Jupiter and the Sun which is fixed in origo. Setting \texttt{task} to \texttt{ESJ2} sets origo as center-of-mass for the same system. \texttt{Task parameter} gives a factor to multpily with Jupiters mass. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet}. 
 Positions of all celestial bodies are written to the file \\ \texttt{ESJ/pos\_dt<dt>\_N<number of timesteps>\_m<mass factor>.xyz}
 \subsubsection*{The whole Solar System}
 Setting \texttt{task} to \texttt{WS} runs the program for a solar system containing the Sun, all the planets and Pluto revolving around the centre of mass. \texttt{Task parameter} sets the number of years one wants the simulation to run. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet}. The position of all celestial bodies are written to the file \\ 
 \texttt{WS/pos\_dt<dt>\_N<number of timesteps>.xyz}
 \subsubsection*{Perhelion precession}
-Setting \texttt{task} to \texttt{GR} runs the program for a two-body solar system containing Mercury and the Sun. \texttt{Task parameter} sets the number of years one wants the simulation to run. \husk{Remember to change this in the program!} \texttt{Method} can be set to either \texttt{Euler}, \texttt{Verlet} or \texttt{VerletREL} where the latter uses Velocity Verlet with a relativistic correction to the gravitation force. The perhelion angle is saved to the file
+Setting \texttt{task} to \texttt{GR} runs the program for a two-body solar system containing Mercury and the Sun. \texttt{Task parameter} sets the number of years one wants the simulation to run. \texttt{Method} can be set to either \texttt{Euler}, \texttt{Verlet} or \texttt{VerletREL} where the latter uses Velocity Verlet with a relativistic correction to the gravitation force. The perhelion angle is saved to the file
 \texttt{GR/ang\_per<method>\_dt<dt>}
 \subsection{Results}
 \subsubsection*{The Earth-Sun system}
@@ -334,5 +306,6 @@ By using Verlet twice, first with acceleration given by equation \eqref{eq:FG_co
 \end{figure}
 As we can see from figure \ref{fig:perhelion} the difference is about $-2.0 \E{-4}$ after Mercury has revolved about 415 times around the Sun. 
 \subsection{Discussion}
+As we can see there are several differences between forward Euler and Velocity Verlet. Regarding FLOPs we can see that Euler has less than half of the amount of FLOPs compared to Velocity Verlet. Here it is important to note that the FLOPs we count are only the FLOPs from the method in itself. The program also has calculation of, for example, $a_i$ adding many more FLOPs to the real calculation. However, we want to compare the two methods and have therefore only included the FLOPs from the methods. \\ \\ The fact that Velocity Verlet has 11 FLOPs compared to Eulers 4 is again shown by the time usage of the two methods in figure \husk{REF Figure}. Forward Euler uses less time compared to Velocity Verlet, but the effectiveness of the algorithm comes at a price. As we can see throughout the result, Velocity Verlet is the far better alternativ when it comes to accuracy. This is evident from the algorithm where Forward Euler bases its position on a Taylor expansion stopping after the first derivative, Velocity Verlet takes the second derivative into account. The error is therefore dependent on $\mathcal{O}(h^2)$ for forward Euler and $\mathcal{O}(h^3)$ for Velocity Verlet.
 \subsection{Conclusion}
 \end{document}

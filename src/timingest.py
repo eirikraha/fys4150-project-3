@@ -67,3 +67,5 @@ savefig("../figures/timeusage.png")
 #yscale('log')
 show()
 
+plot(linspace(0, len(N_arr), len(N_arr)), V_arr/E_arr)
+show()

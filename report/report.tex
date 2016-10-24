@@ -288,6 +288,9 @@ Setting \texttt{task} to \texttt{GR} runs the program for a two-body solar syste
 \texttt{GR/ang\_per<method>\_dt<dt>}
 \subsection{Results}
 \subsubsection*{The Earth-Sun system}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%           ES-Euler         %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[H]
 \centering
 \begin{subfigure}{0.32\textwidth}
@@ -305,26 +308,130 @@ Setting \texttt{task} to \texttt{GR} runs the program for a two-body solar syste
 	\caption{dt = 1.0e-04}
 	\label{fig:eulerdt1.0e-04}
 \end{subfigure}
-\caption{Simulation using forward Euler with different time steps. The initial velocity is in all cases set to 6.28 AU/years, the Sun is fixed in origo and the Earth starts in (1, 0, 0) AU}
-\label{ES-Euler}
+\caption{Simulation of the Earth-Sun system using forward Euler with different time steps. The initial velocity is in all cases set to 6.28 AU/years, the Sun is fixed in origo and the Earth starts in (1, 0, 0) AU}
+\label{fig:ES-Euler}
 \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%          ES-Verlet         %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+	\includegraphics[scale=0.25]{{../figures/ES/ES_Verlet_dt1.0e-01_vy6.28}.png}
+	\caption{dt = 1.0e-01}
+	\label{fig:verletdt1.0e-01}
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+	\includegraphics[scale=0.25]{{../figures/ES/ES_Verlet_dt1.0e-02_vy6.28}.png}
+	\caption{dt = 1.0e-02}
+	\label{fig:verletdt1.0e-02}
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+	\includegraphics[scale=0.25]{{../figures/ES/ES_Verlet_dt1.0e-03_vy6.28}.png}
+	\caption{dt = 1.0e-03}
+	\label{fig:verletdt1.0e-03}
+\end{subfigure}
+\caption{Simulation of the Earth-Sun system using Velocity Verlet with different time steps. The initial velocity is in all cases set to 6.28 AU/years, the Sun is fixed in origo and the Earth starts in (1, 0, 0) AU}
+\label{fig:ES-Verlet}
+\end{figure}
+
+Analytically we found that the escape velocity was 8.82 AU/years. Some of our trial and errors are shown in figure \husk{ref!}
 \subsubsection*{The Earth-Sun-Jupiter system}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%            ESJ1            %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[H]
+\begin{subfigure}{0.32\textwidth}
+\includegraphics[scale=0.25]{{../figures/ESJ1/ESJ1_dt1.0e-02_m1.0}.png}
+\caption{dt = 1.0e-02}
+\label{fig:ESJ11.0e-02}
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+\includegraphics[scale=0.25]{{../figures/ESJ1/ESJ1_dt1.0e-04_m1.0}.png}
+\caption{dt = 1.0e-04}
+\label{fig:ESJ11.0e-04}
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+\includegraphics[scale=0.25]{{../figures/ESJ1/ESJ1_dt1.0e-06_m1.0}.png}
+\caption{dt = 1.0e-06}
+\label{fig:ESJ11.0e-06}
+\end{subfigure}
+\caption{Simulation of the Earth-Sun-Jupiter system using Velocity Verlet with different time steps. Initial velocity and position for the Earth and Jupiter is retrieved from NASA and the Sun is fixed to Origo.}
+\label{fig:ESJ1}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%            ESJ2            %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[H]
+\begin{subfigure}{0.32\textwidth}
+\includegraphics[scale=0.25]{{../figures/ESJ2/ESJ2_dt1.0e-02_m1.0}.png}
+\caption{dt = 1.0e-02}
+\label{fig:ESJ21.0e-02}
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+\includegraphics[scale=0.25]{{../figures/ESJ2/ESJ2_dt1.0e-04_m1.0}.png}
+\caption{dt = 1.0e-04}
+\label{fig:ESJ21.0e-04}
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+\includegraphics[scale=0.25]{{../figures/ESJ2/ESJ2_dt1.0e-06_m1.0}.png}
+\caption{dt = 1.0e-06}
+\label{fig:ESJ21.0e-06}
+\end{subfigure}
+\caption{Simulation of the Earth-Sun-Jupiter system using Velocity Verlet with different time steps. Initial velocity and position for the Earth, the Sun and Jupiter is retrieved from NASA and the center-of-mass is in origo.}
+\label{fig:ESJ2}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%         ESJ-Crash          %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}[H]
+\begin{subfigure}{0.32\textwidth}
+\includegraphics[scale=0.25]{{../figures/ESJ1/ESJ1_dt1.0e-04_m10.0}.png}
+\caption{10 Jupiter masses}
+\label{fig:ESJm10}
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+\includegraphics[scale=0.25]{{../figures/ESJ1/ESJ1_dt1.0e-04_m100.0}.png}
+\caption{100 Jupiter masses}
+\label{fig:ESJm100}
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+\includegraphics[scale=0.25]{{../figures/ESJ1/ESJ1_dt1.0e-04_m1000.0}.png}
+\caption{1000 Jupiter masses}
+\label{fig:ESJm1000}
+\end{subfigure}
+\caption{Simulation of the Earth-Sun-Jupiter system using Velocity Verlet with different mass of Jupiter. Initial velocity and position for the Earth and Jupiter is retrieved from NASA and the Sun is fixed to Origo.}
+\label{fig:ESJ1Crash}
+\end{figure}
 \subsubsection*{The whole Solar System}
 Simulating the Solar System with the Sun, all eight planets and Pluto gave us the results presented in figure \ref{fig:wholesystem}
 %\begin{figure}[H]
 %\centering
 %\includegraphics[scale=0.5]{•}
 %\end{figure}
-\subsubsection*{Perihelion precession}
+\subsubsection*{Perihelion Precession}
 By using Verlet twice, first with acceleration given by equation \eqref{eq:FG_comp} and then by the component version of equation \eqref{eq:FgGR}, we could compare the perihelion angles. With dt = $1e-7$, initial velocity in y-direction for Mercury = 12.44 AU/year, initial position for Mercury = (0.3075, 0, 0) and letting the simulation run for a century we found the results presented in figure \ref{fig:perhelion}
 \begin{figure}[H]
 \centering
-\includegraphics[scale=0.5]{../figures/perheliondt1e-7.png}
+\includegraphics[scale=0.4]{../figures/perheliondt1e-7.png}
 \caption{The difference of perhelion angle for the classical and the general relativity case over a century with time step = $1\E{-7}$. The x-axis gives revolutions around the Sun and the y-axis shows the difference in radians.}
 \label{fig:perhelion}
 \end{figure}
 As we can see from figure \ref{fig:perhelion} the difference is about $-2.0 \E{-4}$ after Mercury has revolved about 415 times around the Sun. 
 \subsection{Discussion}
 As we can see there are several differences between forward Euler and Velocity Verlet. Regarding FLOPs we can see that Euler has less than half of the amount of FLOPs compared to Velocity Verlet. Here it is important to note that the FLOPs we count are only the FLOPs from the method in itself. The program also has calculation of, for example, $a_i$ adding many more FLOPs to the real calculation. However, we want to compare the two methods and have therefore only included the FLOPs from the methods. \\ \\ The fact that Velocity Verlet has 11 FLOPs compared to Eulers 4 is again shown by the time usage of the two methods in figure \husk{REF Figure}. Forward Euler uses less time compared to Velocity Verlet, but the effectiveness of the algorithm comes at a price. As we can see throughout the result, Velocity Verlet is the far better alternativ when it comes to accuracy. This is evident from the algorithm where Forward Euler bases its position on a Taylor expansion stopping after the first derivative, Velocity Verlet takes the second derivative into account. The error is therefore dependent on $\mathcal{O}(h^2)$ for forward Euler and $\mathcal{O}(h^3)$ for Velocity Verlet.
+\subsubsection*{The Earth-Sun system}
+Figures \ref{fig:ES-Euler} and \ref{fig:ES-Verlet} illustrates the difference in accuracy for the two different methods. As we can clearly see, Velocity Verlet is the most accurate. While forward Euler needs $dt = 1.0e-4$ to start being stable, Velocity Verlet is nearly stable at $dt = 1.0e-2$ and stable at $dt = 1.0e-3$. This coincides perfectly with our discussion above. \\ \\
+The escape velocity is like really fast. Not just a bit fast, not just very fast, but really fast! It's just like: Wooooosh! And everyone on Earth are like "Vææææææ!"
+\subsubsection*{The Earth-Sun-Jupiter system}
+The difference in the plots in figure \ref{fig:ESJ1} and \ref{fig:ESJ2} is that the former has the Sun in origo and the latter has center-of-mass in origo. \husk{Write more here!}\\ \\
+
+Changing the mass of Jupiter gave us some interesting results. As one can see from figure \ref{fig:ESJ1Crash} the Earth's trajectory is not very abnormal for a Jupiter that is up to 100 times heavier, but increasing the mass to 1000 times normal, gives us the result in \ref{fig:ESJm1000}. Here we can see that the Earth starts out with a relative normal trajectory. But it very soon comes so close to the Sun that it recieves a gravity asist and is, after a little piroutte, shot out of the Solar System. By zooming in close we could see that the Earth would actually crash into the Sun if we had defined the Sun as a 3D object. If we had done this again we would  have made a animation to really get a good view of Jupiters position as it drags the Earth between itself and the Sun.
+\subsubsection*{Perhelion Precession}
+From figure \ref{fig:perhelion} it becomes clear to us that the difference is about $-2.0\E{-4}$ radians after a century. This coincides almost perfectly with the expected value of 43 arcseconds which is the same as $2.1\E{-4}$. (We can neglect the minus sign since we are only interested in the difference.) As we have discussed in the theory, this effect is explained well by general relativity and our results coincides with this as well. Our plot in figure \ref{fig:perhelion} has a little noice and could have been better with a lower $dt$-value. However, this would have taken a long time and since we have a pretty good result with this time resolution, we decided this was good enough. If we were to publish or use the result for something which required high acuracy, we would run the program again with lower $dt$.
 \subsection{Conclusion}
 \end{document}

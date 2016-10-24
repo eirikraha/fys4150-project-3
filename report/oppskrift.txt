@@ -33,6 +33,7 @@ Latex:
 - Theory: How to add more planets.
 - Results: Write about the Sun's initial velocity
 - Explain that the program sometimes start writing one point early.  
+- Add timing to results
 
 To do that is not Latex:
 - Make a good plotscript. Simen

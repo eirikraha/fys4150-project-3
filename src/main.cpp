@@ -28,7 +28,8 @@ int main(int argc, char *argv[])
         cout<<"   dt : time step" << endl;
         cout<<"   task_param : Meaning depends on Task"<<endl;
         cout<<"     -ES : task_param is initial velocity of the Earth in y direction [AU/yr]."<<endl;
-        cout<<"     -ESJ: task_param spesifies a number multiplied with mass of Jupiter to alter it."<<endl;
+        cout<<"     -ESJ1 and ESJ2: task_param spesifies a number multiplied with mass of Jupiter to alter it."<<endl;
+        cout<<"     -WS and GR: task_param spesifies number of years for simulation to go through" <<endl;
         cout<<"   Method : Euler, Verlet or Verlet with a general relativity term, set to Verlet if not specified" << endl;
         cout<<"    Note that Verlet is actually velocity Verlet, but the name is fairly long, hence the shortening."<<endl;
         exit(1);
@@ -299,6 +300,9 @@ int main(int argc, char *argv[])
 
     }
 
+    /////////////////////////////////////////////
+    ///   Mercury-Sun, general relativity     ///
+    /////////////////////////////////////////////
     else if(strcmp(argv[1], "GR") == 0)
     {
         double years = 100; // the amount of years we want the program to run over

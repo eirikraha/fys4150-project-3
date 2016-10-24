@@ -46,12 +46,12 @@ if __name__=='__main__':
         for filename in files:
             words = filename.split('_')
             method = words[1]
-            dt = float((words[2])[2::])            
-            N = int((words[3])[1::])
+            dt = float((words[2])[2::])
+            years = int((words[3])[3::])
             vy = float((words[4])[2:-4])
 
             # Plotting
-            positions = read_file(filename,N)
+            positions = read_file(filename,1)
 
             plot(positions[0][0,0],positions[0][0,1],'oy',ms=20,label='Sun')
             plot(positions[1][0,0],positions[1][0,1],'ob',ms=10,label='Earth')
@@ -60,15 +60,19 @@ if __name__=='__main__':
             plot(positions[1][:,0],positions[1][:,1],'b',lw=2.0)
             xlabel('x [AU]',size=17)
             ylabel('y [AU]',size=17)
+            legend(numpoints=1,fontsize=14,loc='best')
+            grid('on')
             if vy == 6.28:
                 title('Earth-Sun system, %s, dt=%.1e'%(method,dt),size=17)
+                xlim([-1.2,1.2])
+                ylim([-1.2,1.2])
+                savefig('../figures/%s/ES_%s_dt%.1e_vy%.2f.png'%(task,method,dt,vy))
+
             else:
-                title('Earth-Sun system, %s, dt=%.1e, v=%.1f'%(method,dt,vy),size=17)
-            grid('on')
-            legend(numpoints=1,fontsize=14)
-            xlim([-1.2,1.2])
-            ylim([-1.2,1.2])
-            savefig('../figures/%s/ES_%s_dt%.1e_vy%.2f.png'%(task,method,dt,vy))
+                title('Earth-Sun system, %s, dt=%.1e, v=%.2f'%(method,dt,vy),size=17)
+                xlim([-2,2])
+                ylim([-2,3])
+                savefig('../figures/%s/ES_%s_dt%.1e_yrs%d_vy%.2f.png'%(task,method,dt,years,vy))
             show()
 
 
@@ -78,7 +82,7 @@ if __name__=='__main__':
         for filename in files:
             words = filename.split('_')
             dt = float((words[1])[2::])            
-            N = int((words[2])[1::])
+            #N = int((words[2])[1::])
             m = float((words[3])[1:-4])
         
             # Plotting
@@ -105,6 +109,37 @@ if __name__=='__main__':
             ylim([-6.5,6.5])
             savefig('../figures/%s/%s_dt%.1e_m%.1f.png'%(task,task,dt,m))
             show()
+
+
+    # Plot WS
+    if task=='WS':
+        bodies = ['Sun','Mercury','Venus','Earth','Mars','Jupiter',
+                  'Saturn','Uranus','Neptune','Pluto']
+        colors = ['y','k','w','b','r','m','g','c','0.3','0.8']
+        files = glob.glob('../benchmarks/WS/pos*.xyz')
+        for filename in files:
+            words = filename.split('_')
+            dt = float((words[1])[2::])
+            years = int(float(((words[2])[3:-4])))
+        
+            # Plotting
+            positions = read_file(filename,N)
+            
+            start = 0
+            end = 6
+            for i in range(start,len(positions)- end):
+                plot(positions[i][:,0],positions[i][:,1],color=colors[i],lw=2.0,label=bodies[i])
+            xlabel('x [AU]',size=17)
+            ylabel('y [AU]',size=17)            
+
+            title(r'Full solar system, dt=%.1e, %d years'%(dt,years),size=17)
+            grid('on')
+            legend(numpoints=1,fontsize=14)
+#            xlim([-6.5,6.5])
+#            ylim([-6.5,6.5])
+            savefig('../figures/WS/pos%d%d_dt%.1e_yrs%.1f.png'%(start,end,dt,years))
+            show()
+
 
     # Plot GR
     if task=='GR':

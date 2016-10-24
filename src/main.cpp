@@ -68,12 +68,13 @@ int main(int argc, char *argv[])
         }
 
         // Finding number of time steps based on how many years we want the program to run
-        num_timesteps = 1/dt; // 1 yr / dt [yr]
-        iter = num_timesteps/max_steps;
+        int years = 1;
+        num_timesteps = years/dt; //  yr / dt [yr]
+        if (num_timesteps > max_steps) iter = num_timesteps/max_steps;
 
         // Creating filename for this task
         string meth = method;
-        string filename = "../benchmarks/ES/pos_"+meth+"_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_vy"+to_string(v_y0)+".xyz";
+        string filename = "../benchmarks/ES/pos_"+meth+"_dt"+to_string(dt)+"_yrs"+to_string(years)+"_vy"+to_string(v_y0)+".xyz";
 
         // For timing segments of code, comment out write to file
         //clock_t start, finish;
@@ -129,7 +130,7 @@ int main(int argc, char *argv[])
     }
 
     /////////////////////////////////////////////
-    ///    Earth-Sun-Jupiter, Sun is fixed    ///
+    ///           Earth-Sun-Jupiter           ///
     /////////////////////////////////////////////
     else if(strcmp(argv[1], "ESJ1") == 0 || strcmp(argv[1], "ESJ2") == 0)
     {
@@ -138,12 +139,12 @@ int main(int argc, char *argv[])
         {
             factor = atof(argv[3]);
         }
-
-        num_timesteps = 12/dt;  // checking effect over 12 years
-        iter = num_timesteps/max_steps;
+        int years = 12;  // 12 years a solar system
+        num_timesteps = years/dt;  // finding number of time steps
+        if (num_timesteps > max_steps) iter = num_timesteps/max_steps;
 
         // Creating filename
-        string filename = "../benchmarks/"+(string)argv[1]+"/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+"_m"+to_string(factor)+".xyz";
+        string filename = "../benchmarks/"+(string)argv[1]+"/pos_dt"+to_string(dt)+"_yrs"+to_string(years)+"_m"+to_string(factor)+".xyz";
 
         // Adding objects to the solar system
         solarSystem.createCelestialBody(vec3(0,0,0),vec3(0,0,0),1.0); // adding the Sun
@@ -173,6 +174,12 @@ int main(int argc, char *argv[])
         // Making sure the momentum is zero, correcting the velocity of the Sun
         if (strcmp(argv[1],"ESJ2") == 0)
         {
+            // Placing the sun in the full solar system barycenter
+            vec3 pos_sun = vec3( 3.557522499727856E-03,  3.436899814085439E-03, -1.596344425455737E-04); // position [AU]
+            vec3 vel_sun = vec3(-2.030857186518649E-06,  6.828431295519784E-06,  4.169177553390423E-08); // velocity [AU/day]
+            body.position = pos_sun;
+            body.velocity = vel_sun;
+
             vec3 mom_tot = vec3(0,0,0);
             vec3 mom_sun = body.mass*body.velocity;
             for (unsigned int i=1; i<m_bodies.size(); i++)
@@ -196,16 +203,17 @@ int main(int argc, char *argv[])
     /////////////////////////////////////////////
     else if(strcmp(argv[1], "WS") == 0)
     {
-        double years = 10; // the amount of years we want the program to run over
+        double years = 100; // the amount of years we want the program to run over
         if (argc>3)
         {
             years = atof(argv[3]);
         }
         num_timesteps = (int)(years/dt);
-        iter = num_timesteps/max_steps;
+        max_steps = 100000;
+        if (num_timesteps > max_steps) iter = num_timesteps/max_steps;
 
         // Creating filename
-        string filename = "../benchmarks/WS/pos_dt"+to_string(dt)+"_N"+to_string(num_timesteps)+".xyz";
+        string filename = "../benchmarks/WS/pos_dt"+to_string(dt)+"_yrs"+to_string(years)+".xyz";
 
         // Relative masses, in units [M_sun]
         double M_sun = 2e30;              // mass of the Sun in kg
@@ -293,16 +301,16 @@ int main(int argc, char *argv[])
             integrator.integrateOneStep(solarSystem);
             if (i%iter == 0) solarSystem.writeToFile(filename); // only write to file every iter steps
 
-            if (i%((int)(0.1*num_timesteps)) == 0)
-            {
-                totalEnergy = solarSystem.totalEnergy();
-                momentum = solarSystem.momentum();
-                angularMomentum = solarSystem.angularMomentum();
-                cout<<i<<endl<<"E_tot = "<<totalEnergy<<endl;
-                cout<<"p = "<<momentum.length()<<endl;
-                cout<<"L = "<<angularMomentum.length()<<endl;
-            }
-
+            /*if (i%((int)(0.1*num_timesteps)) == 0)
+            *{
+            *    totalEnergy = solarSystem.totalEnergy();
+            *    momentum = solarSystem.momentum();
+            *    angularMomentum = solarSystem.angularMomentum();
+            *    cout<<i<<endl<<"E_tot = "<<totalEnergy<<endl;
+            *    cout<<"p = "<<momentum.length()<<endl;
+            *    cout<<"L = "<<angularMomentum.length()<<endl;
+            *}
+            */
         }
 
     }

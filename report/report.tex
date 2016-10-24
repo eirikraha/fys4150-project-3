@@ -288,7 +288,26 @@ Setting \texttt{task} to \texttt{GR} runs the program for a two-body solar syste
 \texttt{GR/ang\_per<method>\_dt<dt>}
 \subsection{Results}
 \subsubsection*{The Earth-Sun system}
-
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.32\textwidth}
+	\includegraphics[scale=0.25]{{../figures/ES/ES_Euler_dt1.0e-02_vy6.28}.png}
+	\caption{dt = 1.0e-02}
+	\label{fig:eulerdt1.0e-02}
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+	\includegraphics[scale=0.25]{{../figures/ES/ES_Euler_dt1.0e-03_vy6.28}.png}
+	\caption{dt = 1.0e-03}
+	\label{fig:eulerdt1.0e-03}
+\end{subfigure}
+\begin{subfigure}{0.33\textwidth}
+	\includegraphics[scale=0.25]{{../figures/ES/ES_Euler_dt1.0e-04_vy6.28}.png}
+	\caption{dt = 1.0e-04}
+	\label{fig:eulerdt1.0e-04}
+\end{subfigure}
+\caption{Simulation using forward Euler with different time steps. The initial velocity is in all cases set to 6.28 AU/years, the Sun is fixed in origo and the Earth starts in (1, 0, 0) AU}
+\label{ES-Euler}
+\end{figure}
 \subsubsection*{The Earth-Sun-Jupiter system}
 \subsubsection*{The whole Solar System}
 Simulating the Solar System with the Sun, all eight planets and Pluto gave us the results presented in figure \ref{fig:wholesystem}

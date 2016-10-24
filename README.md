@@ -16,6 +16,8 @@ Task and dt always required, task_param and Method optional and depends on Task.
    dt : time step  
    task_param : Meaning depends on Task  
      -ES : task_param is initial velocity of the Earth in y direction [AU/yr].  
-     -ESJ: task_param spesifies a number multiplied with mass of Jupiter to alter it.  
+     -ESJ1 and ESJ2: task_param spesifies a number multiplied with mass of Jupiter to alter it.  
+     -WS: Number of years.  
+     -GR: Number of years.  
    Method : Euler, Verlet or Verlet with a general relativity term, set to Verlet if not specified  
     Note that Verlet is actually velocity Verlet, but the name is fairly long, hence the shortening.  

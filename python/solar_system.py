@@ -115,7 +115,7 @@ if __name__=='__main__':
     if task=='WS':
         bodies = ['Sun','Mercury','Venus','Earth','Mars','Jupiter',
                   'Saturn','Uranus','Neptune','Pluto']
-        colors = ['y','k','w','b','r','m','g','c','0.3','0.8']
+        colors = ['y','k','0.5','b','r','m','g','c','0.3','0.8']
         files = glob.glob('../benchmarks/WS/pos*.xyz')
         for filename in files:
             words = filename.split('_')
@@ -125,8 +125,8 @@ if __name__=='__main__':
             # Plotting
             positions = read_file(filename,N)
             
-            start = 0
-            end = 6
+            start = 5
+            end = 0
             for i in range(start,len(positions)- end):
                 plot(positions[i][:,0],positions[i][:,1],color=colors[i],lw=2.0,label=bodies[i])
             xlabel('x [AU]',size=17)

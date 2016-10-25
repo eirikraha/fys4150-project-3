@@ -289,8 +289,27 @@ As we can see, the term for $v_{i+1}$ is dependent on $a_{i+1}$. Therefore the a
 Where we calculate $F_{G, r}$ with euation \eqref{eq:FG_comp}. By counting we can see that we have 11 FLOPs  which is a bit more than the double of forward Euler. \husk{Should we change to the one we actually use?}
 
 \subsubsection{The three-body problem}
-\red{adding jupyter}
-
+We have now looked at a simple Earth-Sun solar system. As our own solar system contains a few more celestial bodies of significant size, we should expand upon our model by adding more planets, and see how that affects the stability of the Earth's orbit.\\\\
+For simplicity, we will start by adding Jupiter, as it is both the largest planet, and fairly close to the Earth. Looking at the Earth's motion, we note that adding another body changes the forces affecting Earth. The forces acting on the Earth is then the gravitational force between Earth and the Sun, as well as the force between Earth and Jupiter. The first we found earlier as equation \eqref{eq:FG_comp}, and the interaction between the Earth and Jupiter can be written as
+\begin{align*}
+  F_{\text{E-J}} &= \frac{GM_{\text{E}}M_{\text{J}}}{r^2_{\text{E-J}}}\numberthis\label{eq:F_EJ}
+\end{align*}
+where $M_{\text{J}}$ is the mass of Jupiter, $M_{\text{E}}$ is the mass of the Earth. $G$ is the gravitational constant, and $r_{\text{E-J}}$ is the distance between Earth and Jupiter. We can use equation \eqref{eq:mass_units} to express equation \eqref{eq:F_EJ} in more appropriate units.
+\begin{align*}
+  F_{\text{E-J}} &= \frac{GM_{\text{E}}M_{\text{J}}}{r^2_{\text{E-J}}}\frac{M_{\odot}}{M_{\odot}}
+  \intertext{Written on vector form}
+  &= -\frac{GM_{\odot}M_{\text{E}}}{r^3_{\text{E-J}}}\frac{M_{\text{J}}}{M_{\odot}}\,\mathbf{r}_{\text{E-J}}
+  \intertext{Like before, we we will for simplicity look at only the $x$-direction}
+  F_{\text{E-J},x} &= \frac{4\pi^2\text{AU}^3/yr^2\,M_{\text{E}}}{r^3_{\text{E-J}}}\,x_{\text{E-J}}
+\end{align*}
+We now use Newton's second law to give us the updated differential equation for $x$.
+\begin{align*}
+  \frac{d^2x}{dt^2} &= \frac{F_{G,x} + F_{\text{E-J},x}}{M_{\text{E}}}
+  \intertext{Written fully out, we get the differential equation}
+  \frac{d^2x_{\text{E}}}{dt^2} &= -4\pi^2\text{AU}^3/\text{yr}^2\bigg(\frac{x_{\text{E}}}{r^3_{\text{E}}} + \frac{M_{\text{J}}}{M_{\odot}}\frac{x_{\text{E-J}}}{r^3_{\text{E-J}}}\bigg)\numberthis\label{eq:diffx2}
+\end{align*}
+which can be expanded to three dimensions and discretized like discussed earlier.\\\\
+We observe that when adding another planet (planet 2), the changes to the motion of an object (planet 1) can be expressed by adding a term on the form $4\pi^2\text{AU}^3/\text{yr}^2(M_2/M_{\odot})\cdot(x_{21}/r_{21}^3)$, where $M_2$ is the mass of planet 2, and $x_{21}$ and $r_{21}$ is the distance from planet 2 to planet 1.
 \subsubsection{Perihelion precession}
 Lastly we want to study the perihelion angle of Mercury. This was an important test of the general relativity. When one compared the observed value of the perhelion precession to all classical effects, there was a difference of about 43 arcseconds after a century. This difference was not understood until Einstein predicted it with general relativity.\cite{Perhelion} Einstein found that the perihelion precession could be predicted by:
 \begin{equation}

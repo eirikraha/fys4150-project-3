@@ -137,13 +137,13 @@
 \begin{document}
 \maketitle
 \begin{abstract}
-In this project we will use Euler's forward method and Velocity Verlet to simulate the solar-system from given initial values. We will start off by looking at a solar system which only contains the Earth and the Sun, and then expand it by including other planets, starting with Jupiter. We will also include tests for conservation of kinetic energy, potential energy and angular momentum and find the escape velocity of an Earth like planet in the single planet solar system. Lastly, we will add a general relativistic correction to the gravitational force, and compare the perihelion angle with that given from classical Newtonian gravitation. We found that the Velocity Verlet is quite stable for time steps as large as $dt = 10^{-2}$, while Forward Euler requires $dt = 10^{-4}$ to reproduce the same results. The Velocity Verlet algorithm was found to be approximately twice as slow as Euler. \husk{Write results summary}
+In this project we will use Euler's forward method and Velocity Verlet to simulate the solar-system from given initial values. We will start off by looking at a solar system which only contains the Earth and the Sun, and then expand it by including other planets, starting with Jupiter. We will also include tests for conservation of kinetic energy, potential energy, momentum and angular momentum and find the escape velocity of the Earth in a single planet solar system. Lastly, we will add a general relativistic correction to the gravitational force, and compare the perihelion angle with that given from classical Newtonian gravitation. We found that Velocity Verlet is quite stable for time steps as large as $dt = 10^{-2}$, while Forward Euler requires $dt = 10^{-4}$ to reproduce the same results. The Velocity Verlet algorithm was found to be approximately twice as slow as Euler. The initial velocity of the Earth should be $v = 2 \pi$ and the escape velocity $v = 2\sqrt{2} \pi$. Adding Jupiter doesn't change Earth's motion much, but increasing Jupiter's mass does. Adding more planets was not hard as the code was object oriented. The difference in perihelion angle was 43 arcseconds between the general relativity case and the classical one.
 \end{abstract}
 \subsection{Introduction}
-Differential equations are a big part of physics, and one of the most known differential equation in physics is Newton's second law of motion. Many of our known differential equations can not be solved analytically for more than a few special cases. However, with the advent of computers, we are able to solve increasingly complex systems of differential equations where no analytical solution exists, by utilizing the power and speed at which a computer is able to compute numerical methods. To be able to solve differential equations numerically is therefore a great tool for any physicist, and this project is designed to give us a basic understanding of different methods of solving differential equations numerically, as well as how to write object oriented code in C++. \\ \\
-Our aim with this project is to simulate our own solar system with the two numerical methods, forward Euler and Velocity Verlet. We will start with a system only containing only the Sun and the Earth to compare our two methods. Afterwards we will run a test to see if the values for kinetic energy, potential energy, momentum, and angular momentum are conserved. Thirdly we will see if we can find the escape velocity of the Earth with trial and error, and check how the found escape velocity matches what we expect analytically. \\\\
-The Sun-Earth system will be the basis for the rest of our solar system. When we are sure the smaller system works, we will add more planets (and Pluto) starting with Jupiter. Using object orientation, and the fact that only the gravitational force is acting between the celestial bodies, we will find the sum of all forces working on a celestial body, from the other celestial bodies. By accessing initial conditions from NASA \cite{nasa} we will attempt to make a relatively accurat simulation of the whole solar system. \\\\
-In the final part of the project we will add a general relativistic correction to the gravitational force, and compare the perihelion angle between the classic and the relativistic corrected case for the Sun-Mercury system. %Einstein's theory of general relativity predicts that this difference is about 43 arcseconds after a century.
+Differential equations are a big part of physics, and one of the most known differential equation in physics is Newton's second law of motion. Many of our known differential equations can not be solved analytically for more than a few special cases. However, with the advent of computers, we have been able to solve increasingly complex systems of differential equations where no analytical solution exists, by utilizing the numerical power and speed of computers. To be able to solve differential equations numerically is therefore a great tool for any physicist, and this project is designed to give us a basic understanding of different methods for solving differential equations numerically, as well as how to write object oriented code in C++. \\ \\
+Our aim with this project is to simulate our own solar system with the two numerical methods, forward Euler and Velocity Verlet. We will start with a system only containing the Sun and the Earth and compare our two methods. Afterwards we will run a test to see if the values for kinetic energy, potential energy, momentum and angular momentum are conserved. Thirdly we will see if we can find the escape velocity of the Earth with trial and error, and check how that escape velocity matches what we expect analytically. \\\\
+The Sun-Earth system will be the basis for the rest of our solar system. When we are sure the smaller system works, we will add more planets (and Pluto) starting with Jupiter. Using object orientation, and the fact that the gravitational force is the only force acting between the celestial bodies, we will find the sum of all forces working on a celestial body from the other celestial bodies. By accessing initial conditions from NASA \cite{nasa} we will attempt to simulate a relatively accurate solar system. \\\\
+In the final part of the project we will add a general relativistic correction to the gravitational force and compare the perihelion angle between the classic and the relativistic corrected case for a Sun-Mercury system. %Einstein's theory of general relativity predicts that this difference is about 43 arcseconds after a century.
 If the difference is about 43 arcseconds after a century, we will have an affirmation of Einstein's theory of general relativity.
 \subsection{Theory}
 The goal of this project, is to develop a model of our solar system using the so-called velocity Verlet algorithm for solving coupled ordinary differential equations. For our solar system model, the only force interacting on it is gravity.
@@ -187,7 +187,7 @@ For our Earth, which lies at $r = 1$ AU, equation \eqref{eq:v_circ} gives us $v_
 The total energy of the Earth can be given as $E_{\text{tot,E}} = T_{\text{E}} + U_{\text{E}}$, where
 \begin{align*}
   T_{\text{E}} &= \frac{1}{2}M_{\text{E}}v_{\text{E}}^2
-  \intertext{is the kinetic energy for the Earth, and the potential energy is $U$ of the Earth in our system given as}
+  \intertext{is the kinetic energy for the Earth, and the potential energy $U$ of the Earth in our system is given as}
   U_{\text{E}} &= \frac{GM_{\odot}M_{\text{E}}}{r}\\
   &= \frac{4\pi^2\text{AU}^3/\text{yr}^2\,M_{\text{E}}}{r}
 \end{align*}
@@ -217,13 +217,13 @@ Or when inserting the expression for $GM_{\odot}$ from equation \eqref{eq:mass_u
   x_i'' &= -\frac{4\pi^2 \text{AU}^3/\text{yr}^2}{r^3}\,x_i \numberthis\label{eq:discx}
 \end{align*}
 \subsubsection{Numerical methods for solving ordinary differential equations}
-In order to solve differential equations like equation \eqref{eq:discx}, we need to use some numerical algorithm. Euler's forward method \cite{Euler}, is a well known numerical method used to solve differential equations. The method is fairly simple, basing itself on that the next step is the former step added with its own derivative times a steplength. By defining $h$ as the step length we can write express Euler's forward method as follows:
+In order to solve differential equations like equation \eqref{eq:discx}, we need to use some numerical algorithm. Euler's forward method \cite{Euler}, is a well known numerical method used to solve differential equations. The method is fairly simple, basing itself on that the next step is the former step added with its own derivative times a steplength. By defining $h$ as the step length we can write Euler's forward method as follows:
 \begin{equation}
-f_{i + 1} = f_i + f^{'}_i \cdot h
+f_{i + 1} = f_i + f^{'}_i \cdot h + \mathcal{O}(h^2)
 \label{eq:fwdEuler}
 \end{equation}
 where we define $f_i$ as $f(i)$, $f_{i+1} = f(i + h)$ and $i = 0, 1, 2 ... , n$. \\\\
-In our case we use Newton's laws and we want to find the position and velocity of our celestial bodies. Since it's easy to find the acceleration from equation \eqref{eq:F_final}, and we know that $a = \frac{\partial^2 x}{\partial t^2}$ and $v = \frac{\partial x}{\partial t}$ where $x$ is position, $v$ is velocity and $a$ is acceleration, Euler's forward method becomes:
+In our case we use Newton's second law and we want to find the position and velocity of our celestial bodies. Since it's easy to find the acceleration from equation \eqref{eq:F_final}, and we know that $a = \frac{\partial^2 x}{\partial t^2}$ and $v = \frac{\partial x}{\partial t}$ where $x$ is position, $v$ is velocity and $a$ is acceleration, Euler's forward method becomes:
 \begin{equation}
 v_{i + 1} = v_i + h \cdot a_i + \mathcal{O}(h^2)\\
 \label{eq:Eulervel}
@@ -239,7 +239,7 @@ We can implement the algorithm as follows:
 \begin{algorithmic}[1]
 \For{$i = 0, n$}
 \State $v_{i+1} = v_i + h\cdot a_i $
-\State $x_{i+1} = x_i + h\cdot v_i $
+\State $r_{i+1} = r_i + h\cdot v_i $
 \EndFor
 \end{algorithmic}
 \end{algorithm}
@@ -256,7 +256,7 @@ x_{i+1} - x_{i-1} &= 2h v_i \\
 v_i &= \frac{x_{i+1} - x_{i-1}}{2h}
 \intertext{These expressions for $x_{i+1}$ and $v_i$ are called the Verlet method. However, we want to have an expression for $v_{i+1}$.}
 v_{i+1} &= \frac{x_{i+2} - x_i}{2h} \\
-\intertext{We can easily find $x_{i+1}$ by using the expression above}
+\intertext{We can easily find $x_{i+2}$ by using the expression above}
 x_{i+2} &= 2x_{i+1} - x_i + a_{i+1} h^2 \\
 \intertext{Inserting this back into $v_{i+1}$ gives us:}
 v_{i+1} &= \frac{2x_{i+1} - x_i + a_{i+1} h^2 - x_i}{2h} \\
@@ -299,7 +299,7 @@ where $M_{\text{J}}$ is the mass of Jupiter, $M_{\text{E}}$ is the mass of the E
   F_{\text{E-J}} &= \frac{GM_{\text{E}}M_{\text{J}}}{r^2_{\text{E-J}}}\frac{M_{\odot}}{M_{\odot}}
   \intertext{Written on vector form}
   &= -\frac{GM_{\odot}M_{\text{E}}}{r^3_{\text{E-J}}}\frac{M_{\text{J}}}{M_{\odot}}\,\mathbf{r}_{\text{E-J}}
-  \intertext{Like before, we will for simplicity look at only the $x$-direction}
+  \intertext{Like before, we will for simplicity only look at the $x$-direction}
   F_{\text{E-J},x} &= \frac{4\pi^2\text{AU}^3/yr^2\,M_{\text{E}}}{r^3_{\text{E-J}}}\,x_{\text{E-J}}
 \end{align*}
 We now use Newton's second law to give us the updated differential equation for $x$.
@@ -329,26 +329,27 @@ We can then find the perihelion angle by
 \end{equation}
 where $y_p$ and $x_p$ are $y$ and $x$ respectively at perihelion.
 \subsection{Experimental}
-The programs used in this project can be found in the GitHub repository \cite{Github}, in the \texttt{/src/} folder. When running the program, it takes 4 command line arguments, \texttt{task}, $dt$, \texttt{task\_parameter} and \texttt{method}, however the last two are optional. The program has four different runmodes, which we will discuss in some more detail. All data written to file by the program are stored in \texttt{/benchmarks/} with different subfolders for each runmode.\\\\
+The programs used in this project can be found in the GitHub repository \cite{Github}, in the \texttt{/src/} folder. When running the program, it takes 4 command line arguments, \texttt{task}, $dt$, \texttt{task\_parameter} and \texttt{method}, however the last two are optional. The program has four different runmodes, which we will discuss in some more detail. All data written to file by the program are stored in \texttt{/benchmarks/} with different subfolders for each runmode. For every \texttt{task}, \texttt{method} can be set to either Euler, Verlet or VerletREL where the two first uses forward Euler or Velocity Verlet respectiveley, and the latter uses Velocity Verlet with a relativistic correction to the gravitational force. \\\\
 During the development stage of the code, the total kinetic and potential energy for the system, as well as the momentum and angular momentum were calculated to make sure they are conserved. For every 10 or 100 iterations (depending on $dt$), the values were printed out in terminal, and checked to see if the properties were conserved.% maybe write more
 \subsubsection{The Earth-Sun system}
-Setting \texttt{task} to \texttt{ES} runs the program for a two-body solar system containing the Earth and the Sun, which is fixed in origo. The Earth starts at a distance of 1 AU from the Sun along  the x-axis and \texttt{task\_parameter} gives its initial velocity in the $y$-direction. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet} for using either the forward Euler or Velocity Verlet algorithms. The position vectors of the Sun and the Earth are saved in the file \texttt{ES/pos\_<method>\_dt<dt>\_yrs<number of years>\_vy<initial velocity in y-direction>.xyz}\\ where everything inside a \texttt{<>} means the value given for that run through.\\\\
-In order to calculate the CPU time the Earth-Sun system, the writing to file is commented out, as writing to file is slow. The code required for the timing is commented out as it is unnecessary to do so while running the code normally, and writing positions to file.
+Setting \texttt{task} to \texttt{ES} runs the program for a two-body solar system containing the Earth and the Sun, which is fixed in origo. The Earth starts at a distance of 1 AU from the Sun along  the x-axis and \texttt{task\_parameter} gives its initial velocity in the $y$-direction. The position vectors of the Sun and the Earth are saved in the file \texttt{ES/pos\_<method>\_dt<dt>\_yrs<number of years>\_vy<initial velocity in y-direction>.xyz}\\ where everything inside a \texttt{<>} means the value given for that run through.\\\\
+In order to calculate the CPU time for the Earth-Sun system, the writing to file is commented out, as writing to file is slow. The code required for the timing is commented out as it is unnecessary to do so while running the code normally and writing positions to file.
 \subsubsection{The Earth-Sun-Jupiter system}
-Setting \texttt{task} to \texttt{ESJ1} runs the program for a three-body solar system containing the Earth, Jupiter and the Sun which is fixed in origo. Setting \texttt{task} to \texttt{ESJ2} sets origo as center-of-mass for the same system, and alters the momentum of the Sun so that the total momentum of the entire system is zero. \texttt{task\_parameter} gives a factor to multiply with Jupiters mass. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet}. 
-Positions of all celestial bodies are written to the file \\ \texttt{ESJ/pos\_dt<dt>\_yrs<number of years>\_m<mass factor>.xyz}
+Setting \texttt{task} to \texttt{ESJ1} runs the program for a three-body solar system containing the Earth, Jupiter and the Sun which is fixed in origo. Setting \texttt{task} to \texttt{ESJ2} sets origo as center-of-mass for the same system, and alters the momentum of the Sun so that the total momentum of the entire system is zero. \texttt{task\_parameter} gives a factor to multiply with Jupiters mass.
+Positions of all celestial bodies are written either \\ \texttt{ESJ1/pos\_dt<dt>\_yrs<number of years>\_m<mass factor>.xyz} or \\
+\texttt{ESJ2/pos\_dt<dt>\_yrs<number of years>\_m<mass factor>.xyz} depending on \texttt{task}.
 \subsubsection{The whole Solar System}
-Setting \texttt{task} to \texttt{WS} runs the program for a solar system containing the Sun, all the planets and Pluto revolving around the centre of mass. \texttt{task\_parameter} sets the number of years one wants the simulation to run. \texttt{Method} can be set to either \texttt{Euler} or \texttt{Verlet}. The position of all celestial bodies are written to the file \\ 
+Setting \texttt{task} to \texttt{WS} runs the program for a solar system containing the Sun, all the planets and Pluto revolving around the centre of mass. \texttt{task\_parameter} sets the number of years one wants the simulation to run. The position of all celestial bodies are written to the file \\ 
 \texttt{WS/pos\_dt<dt>\_yrs<number of years>.xyz}
 \subsubsection{Perihelion precession}
-Setting \texttt{task} to \texttt{GR} runs the program for a two-body solar system containing Mercury and the Sun. \texttt{task\_parameter} sets the number of years one wants the simulation to run. \texttt{Method} can be set to either \texttt{Euler}, \texttt{Verlet} or \texttt{VerletREL} where the latter uses Velocity Verlet with a relativistic correction to the gravitation force. The perihelion angle is saved to the file
+Setting \texttt{task} to \texttt{GR} runs the program for a two-body solar system containing Mercury and the Sun. \texttt{task\_parameter} sets the number of years one wants the simulation to run. The perihelion angle is saved to the file
 \texttt{GR/ang\_per<method>\_dt<dt>}
 
 \subsubsection{An error while writing to file}
 One of the main goals of our implementation, is to write the positions of the celestial bodies to file, however for some unknown reason, the first positions saved to file is not always the initial positions.
 \subsection{Results}
 \subsubsection{The Earth-Sun system}
-By initializing a system containing the Earth and the Sun and simulating it using forward Euler with different time steps we got the plots shown in figure \ref{fig:ES-Euler}. And by doing the same only with Velocity Verlet we achieved the plots in figure \ref{fig:ES-Verlet}. 
+By initializing a system containing the Earth and the Sun and simulating it using forward Euler with different time steps we got the plots shown in figure \ref{fig:ES-Euler}. By doing the same only with Velocity Verlet we achieved the plots in figure \ref{fig:ES-Verlet}. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%           ES-Euler         %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -369,7 +370,7 @@ By initializing a system containing the Earth and the Sun and simulating it usin
 	\caption{dt = 1.0e-04}
 	\label{fig:eulerdt1.0e-04}
 \end{subfigure}
-\caption{Simulation of the Earth-Sun system using forward Euler with different time steps. The initial velocity is in all cases set to 6.28 AU/years, the Sun is fixed in origo and the Earth starts in (1, 0, 0) AU}
+\caption{Simulation of the Earth-Sun system using forward Euler with different time steps. The Earth's initial velocity is in all cases set to 6.28 AU/years in the y-direction, the Sun is fixed in origo and the Earth starts in (1, 0, 0) AU}
 \label{fig:ES-Euler}
 \end{figure}
 
@@ -393,14 +394,14 @@ By initializing a system containing the Earth and the Sun and simulating it usin
 	\caption{dt = 1.0e-04}
 	\label{fig:verletdt1.0e-04}
 \end{subfigure}
-\caption{Simulation of the Earth-Sun system using Velocity Verlet with different time steps. The initial velocity is in all cases set to 6.28 AU/years in the y-direction, the Sun is fixed in origo and the Earth starts in (1, 0, 0) AU}
+\caption{Simulation of the Earth-Sun system using Velocity Verlet with different time steps. The Earth's initial velocity is in all cases set to 6.28 AU/years in the y-direction, the Sun is fixed in origo and the Earth starts in (1, 0, 0) AU}
 \label{fig:ES-Verlet}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%          ES-escape         %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Analytically we found that the escape velocity was 8.89 AU/years. Some of our trial and errors are shown in figure \ref{fig:ESe}:
+Analytically we found that the Earth's escape velocity was 8.89 AU/years. Some of our trial and errors are shown in figure \ref{fig:ESe}:
 \begin{figure}[H]
   \centering
 \begin{subfigure}{0.49\textwidth}
@@ -418,13 +419,13 @@ Analytically we found that the escape velocity was 8.89 AU/years. Some of our tr
 \caption{$v = 10.00$ AU/years}
 \label{fig:ESe10}
 \end{subfigure}
-\caption{Simulation of the Earth-Sun system using Velocity Verlet with different initial velocity for the Earth. The velocity is only in the y-direction. The Sun is fixed in origo and the Earth starts in (1, 0, 0) AU. Simulates a time period of two years.}
+\caption{Simulation of the Earth-Sun system using Velocity Verlet with different initial velocity for the Earth in the y-direction. The Sun is fixed in origo and the Earth starts in (1, 0, 0) AU. Simulates a time period of two years.}
 \label{fig:ESe}
 \end{figure}
 The differences in execution time for the forward Euler and velocity Verlet algorithms for various time steps are shown in table \ref{tab:time}.
 \begin{table}[H]
   \centering
-  \caption{Execution time for the two numerical algorithms for time steps dt. All values are given in units [year].}
+  \caption{Execution time for the two numerical algorithms for time steps dt. All values are given in units [second].}
   \begin{tabular}{c|c|c}
     dt &Forward Euler &Velocity Verlet \\\hline
     1e-1 & 4.00e-5 & 4.10e-5\\\hline
@@ -439,7 +440,7 @@ The differences in execution time for the forward Euler and velocity Verlet algo
   \label{tab:time}
 \end{table}
 \subsubsection{The Earth-Sun-Jupiter system}
-Adding Jupiter to our system and keeping the Sun in origo we achieved the plots shown in figure \ref{fig:ESJ1}. By letting the Sun move around the center-of-mass, we got the plots in figure \ref{fig:ESJ2}. The plots in figure \ref{fig:ESJ1Crash} were drawn by letting the mass of Jupiter increase while the Sun was fixed in origo.
+Adding Jupiter to our system and keeping the Sun in origo we achieved the plots shown in figure \ref{fig:ESJ1}. By letting the Sun move around the center-of-mass, we got the plots in figure \ref{fig:ESJ2}. The plots in figure \ref{fig:ESJ1Crash} were drawn by letting the mass of Jupiter increase while the Sun was fixed in origo. An animation of the events leading up to figure \ref{fig:ESJm1000} can be found in \texttt{/figures/esj.gif} in our GitHub repository \cite{Github}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%            ESJ1            %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -543,21 +544,25 @@ By using Verlet twice, first with acceleration given by equation \eqref{eq:F_fin
 \end{figure}
 As we can see from figure \ref{fig:perihelion} the difference is about $-2.0 \E{-4}$ after Mercury has revolved about 415 times around the Sun. 
 \subsection{Discussion}
-As we can see there are several differences between forward Euler and Velocity Verlet. Regarding FLOPs we can see that Euler has less than half of the amount of FLOPs compared to Velocity Verlet. Here it is important to note that the FLOPs we count are only the FLOPs from the method in itself. The program also has calculation of, for example, $a_i$ adding many more FLOPs to the real calculation. However, we want to compare the two methods and have therefore only included the FLOPs from the methods. \\ \\ 
-The fact that Velocity Verlet has 11 FLOPs compared to Eulers 4 is again shown by the time usage of the two methods in table \ref{tab:time}. Forward Euler uses significantly less time compared to Velocity Verlet, but the effectiveness of the algorithm comes at a price. As we can see throughout the result, Velocity Verlet is the far better alternative when it comes to accuracy. This is evident from the algorithm where Forward Euler bases its position on a Taylor expansion stopping after the first derivative, Velocity Verlet takes the second derivative into account. The error is therefore dependent on $\mathcal{O}(h^2)$ for forward Euler and $\mathcal{O}(h^3)$ for Velocity Verlet.
+As we can see there are several differences between forward Euler and Velocity Verlet. Regarding FLOPs we can see that Euler has less than half the amount of FLOPs compared to Velocity Verlet. Here it is important to note that the FLOPs we count are only the FLOPs from the method in itself. The program also has calculation of, for example, $a_i$ adding many more FLOPs to the real calculation. However, we want to compare the two methods and have therefore only included the FLOPs from the methods. \\ \\ 
+The fact that Velocity Verlet has 11 FLOPs compared to Eulers 4 is again shown by the time usage of the two methods in table \ref{tab:time}. Forward Euler uses significantly less time compared to Velocity Verlet, but the effectiveness of the algorithm comes at a price. As we can see throughout the results, Velocity Verlet is the far better alternative when it comes to accuracy. This is evident from the algorithm as Forward Euler bases its position on a Taylor expansion stopping after the first derivative, Velocity Verlet takes the second derivative into account. The error is therefore dependent on $\mathcal{O}(h^2)$ for forward Euler and $\mathcal{O}(h^3)$ for Velocity Verlet. \\ \\
+If one studies the code, you will see that the Velocity Verlet could have been efficient. As the program is now, we calculate $a_i$ and $a_{i+1}$ for each loop, but a more efficient code would reuse the term $a_{i+1}$ the next time it goes through the loop. If we were to do this project again, we would look into how to implement this in an efficient way.
 \subsubsection{The Earth-Sun system}
 Figures \ref{fig:ES-Euler} and \ref{fig:ES-Verlet} illustrates the difference in accuracy for the two different methods. As we can clearly see, Velocity Verlet is the most accurate. While forward Euler needs $dt = 1.0e-4$ to start being stable, Velocity Verlet is nearly stable at $dt = 1.0e-2$ and stable at $dt = 1.0e-3$. This coincides perfectly with our discussion above. It is worth pointing out that the small discrepancy at $dt = 1.0e-2$ for Velocity Verlet is due to the error in the implementation, discussed earlier, where the initial positions are not always saved to file.\\ \\
-Finding the escape velocity through trial and error is hard. As we can see from figure \ref{fig:ESe8} it seems as though this could be an escape velocity. However, this is not the case. The simulations in figure \ref{fig:ESe} runs for two years, and then stops. If we had run the simulation for a longer time period, we would see that all velocities below 8.89 AU/year would eventually come back and all equal or above would not. Our numerical results seems to fit the analytical result, but running the simulations for longer time period would have been ideal. For velocities close to the analytical escape velocity, the time required to see if the object escapes gets quite high, as the orbit could potentially be a very elliptical orbit.%We can say that our numerical results most likely would fit the analytical perfectly if we could simulate an infinite time period, but until the we would get a decreasing escape velocity numerically as we increased the time period.
+Finding the escape velocity through trial and error is hard. As we can see from figure \ref{fig:ESe8} it seems as though the velocity given here could be an escape velocity. However, this is not the case. The simulations in figure \ref{fig:ESe} runs for two years, and then stops. If we had run the simulation for a longer time period, we would see that all velocities below 8.89 AU/year would eventually come back and all equal or above would not. Our numerical results seems to fit the analytical result, but running the simulations for longer time period would have been ideal. For velocities close to the analytical escape velocity, the time required to see if the object escapes gets quite high, as the orbit could potentially be a very elliptical orbit.%We can say that our numerical results most likely would fit the analytical perfectly if we could simulate an infinite time period, but until the we would get a decreasing escape velocity numerically as we increased the time period.
 \subsubsection{The Earth-Sun-Jupiter system}
-The difference in the plots in figure \ref{fig:ESJ1} and \ref{fig:ESJ2} is that the former has the Sun in origo and the latter has center-of-mass in origo. As we can see they are in almost all manners, completely alike. This is because the Sun is so massive that it will stay so close to the center-of-mass even though we don't stick it to origo. By zooming in on the plots in figure \ref{fig:ESJ2} we saw that the Sun did move around origo, but the movement was so small that it would have moved within its own radius. It is more precise to let the Sun move because of the gravitational forces from Earth and Jupiter, but it is practically the same as letting it stay in origo. Therefore, it once again depends on what you want to use the program for. If your goal is to study the Sun's movement around the center-of-mass or you need the simulation as precise as possible, let the Sun move around. If not, you could just keep it still and maybe find a way to not have to calculate the force effecting the Sun and save time. \\
+Comparing figure \ref{fig:ES-Verlet}, \ref{fig:ESJ1} and \ref{fig:ESJ2} we can see clearly that adding Jupiter almost doesn't change Earth's motion at all. \\
+The difference between figure \ref{fig:ESJ1} and \ref{fig:ESJ2} is that the former has the Sun in origo and the latter has center-of-mass in origo. As we can see they are in almost all manners, completely alike. This is because the Sun is so massive that it will stay close to the center-of-mass even though we don't stick it to origo. By zooming in on the plots in figure \ref{fig:ESJ2} we saw that the Sun did move around origo, but the movement was so small that it would have moved within its own radius.\\
+ It is more precise to let the Sun move because of the gravitational forces from Earth and Jupiter, but it is practically the same as letting it stay in origo. Therefore, it depends on what you want to use the program for. If your goal is to study the Sun's movement around the center-of-mass or you need the simulation as precise as possible, let the Sun move around. If not, you could just keep it still and maybe find a way to not have to calculate the force effecting the Sun and save time. \\
 
-Changing the mass of Jupiter gave us some interesting results. As one can see from figure \ref{fig:ESJ1Crash} the Earth's trajectory does not really change much for a Jupiter that is up to 100 times heavier, but increasing the mass further to 1000 times normal, gives us the result in \ref{fig:ESJm1000}. Here we can see that the Earth starts out with a relative normal trajectory. But it very soon comes so close to the Sun that it recieves a gravity assist and is, after a little piroutte, shot out of the Solar System. By zooming in close we could see that the Earth would actually crash into the Sun if we had defined the Sun as a 3D object with a radius. If we had done this again we would have made a animation to really get a good view of Jupiters position as it drags the Earth between itself and the Sun.
+Changing the mass of Jupiter gave us some interesting results. As one can see from figure \ref{fig:ESJ1Crash} the Earth's trajectory does not really change much for a Jupiter that is up to 100 times heavier, but increasing the mass further to 1000 times normal, gives us the result in \ref{fig:ESJm1000}. Here we can see that the Earth starts out with a relative normal trajectory. But it very soon comes so close to the Sun that it recieves a gravity assist and is, after a little piroutte, shot out of the Solar System. By zooming in close we could see that the Earth would actually crash into the Sun if we had defined the Sun as a 3D object with a radius. To really get a good understanding of Jupiter's movement and it's effect on Earth we made a \texttt{.gif} for the 1000 times mass case. This file can be found in \texttt{/figures/esj.gif} in our GitHub repository \cite{Github}. As we can see from  this animation the Earth goes back and forth between Jupiter and the Sun for a little while and goes around the Sun every time Jupiter gets a bit far away. The third time the Earth goes around the Sun it gets shot out of the system.
 
 \subsubsection{The whole Solar System}
-The whole Solar System, including Pluto as we all love Pluto, is shown in figure \ref{fig:WS}. We had to divide the System into its inner and outer part as the distances traveled by the outer planets are very large compared to those of the inner ones. These simulations were very easily made as our code was already object oriented. When we knew that our smaller system worked, we just added more planets giving by calling the right function and giving them initial position, velocity and mass. This shows one of the great strengths of object oriented programming as we could have added all the celestial bodies we wanted as long as we knew position, velocity and mass by only adding three more lines of code. And as we can see from \ref{fig:WS} the calculations still seems valid even though we have added a lot of planets.
+The whole Solar System, including Pluto as we all love Pluto, is shown in figure \ref{fig:WS}. We had to divide the System into its inner and outer part as the distances traveled by the outer planets are very large compared to those of the inner ones. These simulations were very easily made as our code was already object oriented. When we knew that our smaller system worked, we just added more planets by calling the right function and giving them initial position, velocity and mass. This shows one of the great strengths of object oriented programming as we could have added all the celestial bodies we wanted as long as we knew position, velocity and mass by only adding three more lines of code. And as we can see from \ref{fig:WS} the calculations still seem valid even though we have added a lot of planets.
 \subsubsection{Perihelion Precession}
-From figure \ref{fig:perihelion} it becomes clear to us that the difference is about $-2.0\E{-4}$ radians after a century. This coincides almost perfectly with the expected value of 43 arcseconds which is the same as $2.1\E{-4}$. (We can neglect the minus sign since we are only interested in the difference.) As we have discussed in the theory, this effect is explained well by general relativity and our results coincides with this as well. Our plot in figure \ref{fig:perihelion} has a little noise and could have been better with a lower $dt$-value. However, this would have taken a long time and since we have a pretty good result with this time resolution, we decided this was good enough. If we were to publish or use the result for something which required high accuracy, we would run the program again with lower $dt$. \\ \\
+From figure \ref{fig:perihelion} it becomes clear to us that the difference is about $-2.0\E{-4}$ radians after a century. This coincides almost perfectly with the expected value of 43 arcseconds which is the same as $2.1\E{-4}$ radians. (We can neglect the minus sign since we are only interested in the difference.) As we have discussed in the theory, this effect is explained well by general relativity and our results coincides with the analytical value as well. Our plot in figure \ref{fig:perihelion} has a little noise and could have been better with a lower $dt$-value. However, this would have taken a long time to run and since we have a pretty good result with this time resolution, we decided this was good enough. If we were to publish or use the result for something which required high accuracy, we would run the program again with lower $dt$. \\ \\
 It has come to our attention that the original mass of Mercury was wrong and we used $2.4\E{23}$ kg when we should have used $3.3 \E{23}$kg. The difference caused by this is most likely small, as we scale the mass with the solar mass. As our results seems to replicate the expected result very well, and the execution time for this calculation is fairly long, rerunning the program with the correct mass is not a main priority at this point. %If we were to do the project again we would use the right mass, but we are certain it would not give a significantly different result.
 \subsection{Conclusion}
+In the end this has been a fun project. We found that Velocity Verlet was the more accurate method as it was stable at time steps as large as $dt = 10^{-2}$ while forward Euler needs $dt = 10^{-4}$ to be stable, but forward Euler requires less time to calculate. We found that the initial velocity of the Earth should be $v = 2\pi$ and that the escape velocity has a threshold at $v = 2\sqrt{2}\pi$. By adding Jupiter we almost didn't change the Earth's motion but by increasing the mass of Jupiter to 1000 times more changed the Earth's motions so much it shot out of the system. Adding more planets to our system was easy since we had an object oriented code and the system was stable for the entire solar system over a time span of 500 years. The difference in perihelion angle between the classic case and the general relativity one was almost exactly 43 arcseconds and thus affirming general relativity as this coincides with the observed difference from the classical case. %This project is one you can have a lot of fun with as long as the framework is working. We are looking forward to finding this code again in the future and play around with it.
 \bibliography{references}
 \end{document}
